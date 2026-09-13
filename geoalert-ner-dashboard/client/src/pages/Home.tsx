@@ -1,4 +1,4 @@
-// GeoAlert-NER Landing Page: Clean, modern climate-tech surface for North-East India landslide early warning.
+// GeoAlert Landing Page: Clean, modern climate-tech surface for North-East India landslide early warning.
 import { useState } from "react";
 import { Activity, ArrowDownRight, ArrowUpRight, ChevronRight, Layers3, Moon, Radio, ShieldAlert, Sun } from "lucide-react";
 import { useLocation } from "wouter";
@@ -21,10 +21,10 @@ export default function Home() {
     <div className="app-shell">
       {/* Completely Transparent Top Header - No Border, Pure Clean */}
       <header className="topbar">
-        <a className="brand-lockup flex items-center gap-2.5" href="#top" aria-label="GeoAlert-NER home">
-          <img src="/logo.png" alt="GeoAlert Logo" className="h-8 w-auto object-contain shrink-0 filter drop-shadow-sm transition-transform hover:scale-105" />
+        <a className="brand-lockup flex items-center gap-3" href="#top" aria-label="GeoAlert home">
+          <img src="/logo.png" alt="GeoAlert Logo" className="h-11 md:h-12 w-auto object-contain shrink-0 filter drop-shadow-md transition-transform hover:scale-105" />
           <span className="flex flex-col">
-            <strong className="text-xs font-mono tracking-widest text-foreground font-bold">GEOALERT-NER</strong>
+            <strong className="text-sm font-mono tracking-widest text-foreground font-bold">GEOALERT</strong>
             <small className="text-[9px] font-mono text-emerald-400/80 tracking-wider">EARLY WARNING SYSTEM</small>
           </span>
         </a>
@@ -64,7 +64,7 @@ export default function Home() {
           <div className="hero-copy">
             <p className="eyebrow accent-eyebrow"><span className="eyebrow-line" /> AI + GIS EARLY WARNING · NER</p>
             <h1>Know the slope<br /><em>before</em> it moves.</h1>
-            <p className="hero-description">GeoAlert-NER turns rainfall, terrain, satellite context, and live sensor signals into a clear window for action across North-East India.</p>
+            <p className="hero-description">GeoAlert turns rainfall, terrain, satellite context, and live sensor signals into a clear window for action across North-East India.</p>
             <div className="hero-actions">
               <button
                 className="h-9 px-4.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-[11px] uppercase tracking-wider font-semibold flex items-center gap-2 transition-all shadow-md hover:shadow-emerald-500/25 active:scale-95 cursor-pointer"
@@ -166,9 +166,9 @@ export default function Home() {
         <div className="footer-container">
           {/* Brand Column */}
           <div className="footer-brand-col">
-            <div className="brand-lockup flex items-center gap-2.5">
-              <img src="/logo.png" alt="GeoAlert Logo" className="h-9 w-auto object-contain shrink-0" />
-              <span><strong className="text-sm tracking-wider">GEOALERT-NER</strong><small className="text-[10px] opacity-75"> / ETHRIX</small></span>
+            <div className="brand-lockup flex items-center gap-3">
+              <img src="/logo.png" alt="GeoAlert Logo" className="h-12 md:h-14 w-auto object-contain shrink-0 filter drop-shadow-sm" />
+              <span><strong className="text-base tracking-wider">GEOALERT</strong><small className="text-[10px] opacity-75"> / ETHRIX</small></span>
             </div>
             <p className="footer-tagline">
               AI + GIS-driven landslide early warning platform tailored for Northeast India terrain. Sensor-aware · Response-ready.
@@ -207,7 +207,7 @@ export default function Home() {
 
         {/* Bottom Bar */}
         <div className="footer-bottom-bar">
-          <span>© 2026 GEOALERT-NER · ETHRIX SIH PROJECT</span>
+          <span>© 2026 GEOALERT · ETHRIX SIH PROJECT</span>
           <span className="font-mono text-[10px] opacity-70">LAT 26.2006° N · LON 92.9376° E</span>
         </div>
       </footer>
