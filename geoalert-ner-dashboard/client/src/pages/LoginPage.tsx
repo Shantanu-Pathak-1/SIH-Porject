@@ -38,10 +38,8 @@ export default function LoginPage() {
     <div className="login-page">
       <div className="login-art bg-gradient-to-br from-emerald-950 via-slate-900 to-teal-950">
         <div className="login-art-shade" />
-        <a className="login-brand flex items-center gap-2" href="/">
-          <div className="h-8 w-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-            <Activity size={18} />
-          </div>
+        <a className="login-brand flex items-center gap-2.5" href="/">
+          <img src="/logo.png" alt="GeoAlert Logo" className="h-8 w-auto object-contain shrink-0" />
           <span><strong>GEOALERT-NER</strong><small> / ETHRIX</small></span>
         </a>
         <div className="login-art-copy">

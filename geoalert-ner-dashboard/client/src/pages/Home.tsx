@@ -167,9 +167,7 @@ export default function Home() {
           {/* Brand Column */}
           <div className="footer-brand-col">
             <div className="brand-lockup flex items-center gap-2.5">
-              <div className="h-8 w-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-                <Activity size={18} />
-              </div>
+              <img src="/logo.png" alt="GeoAlert Logo" className="h-9 w-auto object-contain shrink-0" />
               <span><strong className="text-sm tracking-wider">GEOALERT-NER</strong><small className="text-[10px] opacity-75"> / ETHRIX</small></span>
             </div>
             <p className="footer-tagline">

@@ -1,0 +1,11 @@
+{
+  "buildCommand": "cd geoalert-ner-dashboard && npm install && pnpm run build",
+  "outputDirectory": "geoalert-ner-dashboard/dist/public",
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
