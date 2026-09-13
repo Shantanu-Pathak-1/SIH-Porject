@@ -40,52 +40,52 @@ export default function Home() {
 
   return (
     <div className="app-shell">
-      {/* Top Hero Container with Video Background */}
-      <div className="relative overflow-hidden bg-forest-950">
-        {/* Background Video Layer */}
+      {/* Top Hero Container with Video Background - Locked Dark Theme Aesthetic regardless of site theme */}
+      <div className="relative overflow-hidden bg-[#082a27]">
+        {/* Background Video Layer - High Visibility & Vibrancy */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           <video
             autoPlay
             loop
             muted
             playsInline
-            className="w-full h-full object-cover opacity-35 filter brightness-90 contrast-110 scale-105"
+            className="w-full h-full object-cover opacity-70 filter brightness-105 contrast-105 scale-105 transition-all duration-700"
           >
             <source src="/videos/hero-bg.mp4" type="video/mp4" />
             <source src="/hero-bg.mp4" type="video/mp4" />
           </video>
-          {/* Subtle gradient overlays for pristine readability */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#082a27]/85 via-[#082a27]/55 to-[#082a27]" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#082a27]/40 to-[#082a27]/90" />
+          {/* Refined gradient overlays: Soft so video is clearly visible while text pops */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#082a27]/55 via-[#082a27]/25 to-[#082a27]/85" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#082a27]/20 to-[#082a27]/80" />
         </div>
 
-        {/* Completely Transparent Top Header - No Border, Pure Clean */}
+        {/* Completely Transparent Top Header - Clean White & Emerald Brand */}
         <header className="topbar relative z-10">
           <a className="brand-lockup flex items-center gap-3" href="#top" aria-label="GeoAlert home">
             <img src="/logo.png" alt="GeoAlert Logo" className="h-11 md:h-12 w-auto object-contain shrink-0 filter drop-shadow-md transition-transform hover:scale-105" />
             <span className="flex flex-col">
-              <strong className="text-sm font-mono tracking-widest text-foreground font-bold">GEOALERT</strong>
-              <small className="text-[9px] font-mono text-emerald-400/80 tracking-wider">EARLY WARNING SYSTEM</small>
+              <strong className="text-sm font-mono tracking-widest text-white font-bold">GEOALERT</strong>
+              <small className="text-[9px] font-mono text-emerald-400 tracking-wider">EARLY WARNING SYSTEM</small>
             </span>
           </a>
 
           {/* Clean Nav Links */}
           <nav className="hidden md:flex items-center gap-8">
-            <a href="#top" className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-emerald-400 transition-colors">Overview</a>
-            <a href="#workflow" className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-emerald-400 transition-colors">Workflow</a>
-            <a href="#risk-levels" className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-emerald-400 transition-colors">Risk Levels</a>
-            <a href="#field-note" className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-emerald-400 transition-colors">Field Note</a>
+            <a href="#top" className="text-xs font-mono uppercase tracking-wider text-white/75 hover:text-emerald-300 transition-colors">Overview</a>
+            <a href="#workflow" className="text-xs font-mono uppercase tracking-wider text-white/75 hover:text-emerald-300 transition-colors">Workflow</a>
+            <a href="#risk-levels" className="text-xs font-mono uppercase tracking-wider text-white/75 hover:text-emerald-300 transition-colors">Risk Levels</a>
+            <a href="#field-note" className="text-xs font-mono uppercase tracking-wider text-white/75 hover:text-emerald-300 transition-colors">Field Note</a>
           </nav>
 
           <div className="top-actions flex items-center gap-3">
             {/* Stylish Theme Toggle Button */}
             <button
               onClick={toggleTheme}
-              className="h-8 w-8 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 hover:scale-105 flex items-center justify-center transition-all shadow-sm cursor-pointer"
+              className="h-8 w-8 rounded-full bg-white/10 border border-white/20 text-amber-300 hover:bg-white/20 hover:scale-105 flex items-center justify-center transition-all shadow-sm cursor-pointer"
               aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
               title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
             >
-              {theme === "dark" ? <Sun size={15} className="text-amber-400" /> : <Moon size={15} className="text-emerald-300" />}
+              {theme === "dark" ? <Sun size={15} className="text-amber-400" /> : <Moon size={15} className="text-white" />}
             </button>
 
             {/* Compact Sleek Open Dashboard Button */}
@@ -102,9 +102,9 @@ export default function Home() {
           {/* Full Viewport Hero Section */}
           <section className="hero-section">
             <div className="hero-copy">
-              <p className="eyebrow accent-eyebrow"><span className="eyebrow-line" /> AI + GIS EARLY WARNING · NER</p>
-              <h1>Know the slope<br /><em>before</em> it moves.</h1>
-              <p className="hero-description">GeoAlert turns rainfall, terrain, satellite context, and live sensor signals into a clear window for action across North-East India.</p>
+              <p className="eyebrow accent-eyebrow !text-amber-400 font-semibold"><span className="eyebrow-line !bg-amber-400" /> AI + GIS EARLY WARNING · NER</p>
+              <h1 className="!text-white font-bold">Know the slope<br /><em className="hero-highlight">before</em> it moves.</h1>
+              <p className="hero-description !text-white/90">GeoAlert turns rainfall, terrain, satellite context, and live sensor signals into a clear window for action across North-East India.</p>
               <div className="hero-actions">
                 <button
                   className="h-9 px-4.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-[11px] uppercase tracking-wider font-semibold flex items-center gap-2 transition-all shadow-md hover:shadow-emerald-500/25 active:scale-95 cursor-pointer"
@@ -112,11 +112,11 @@ export default function Home() {
                 >
                   Open Dashboard <ArrowUpRight size={15} />
                 </button>
-                <a className="secondary-cta !h-9 !px-4 !text-[11px] !rounded-md" href="#workflow">Explore System <ChevronRight size={14} /></a>
+                <a className="secondary-cta !h-9 !px-4 !text-[11px] !rounded-md !text-white !border-white/30 hover:!border-amber-400 hover:!text-amber-400 !bg-white/5" href="#workflow">Explore System <ChevronRight size={14} /></a>
               </div>
               <div className="hero-meta">
-                <span><ShieldAlert size={13} /> Built for response teams</span>
-                <span><Radio size={13} /> Works through network loss</span>
+                <span className="!text-white/85 !border-white/20 !bg-[#06221f]/70"><ShieldAlert size={13} className="text-amber-400" /> Built for response teams</span>
+                <span className="!text-white/85 !border-white/20 !bg-[#06221f]/70"><Radio size={13} className="text-amber-400" /> Works through network loss</span>
               </div>
             </div>
 
@@ -145,22 +145,22 @@ export default function Home() {
       <div>
         {/* Signal Band */}
         <section className="signal-band scroll-reveal">
-          <div className="signal-lead"><p className="eyebrow">THE IDEA IN BRIEF</p><strong>Signals become time.<br /><em>Time becomes safer decisions.</em></strong></div>
-          <div className="signal-stat"><strong>07</strong><span>NER states in scope</span></div>
-          <div className="signal-stat"><strong>03</strong><span>core signal families</span></div>
-          <div className="signal-stat"><strong>03</strong><span>alert channels planned</span></div>
+          <div className="signal-lead reveal-text"><p className="eyebrow">THE IDEA IN BRIEF</p><strong>Signals become time.<br /><em className="text-shimmer">Time becomes safer decisions.</em></strong></div>
+          <div className="signal-stat reveal-item reveal-delay-1"><strong>07</strong><span>NER states in scope</span></div>
+          <div className="signal-stat reveal-item reveal-delay-2"><strong>03</strong><span>core signal families</span></div>
+          <div className="signal-stat reveal-item reveal-delay-3"><strong>03</strong><span>alert channels planned</span></div>
         </section>
 
         {/* Workflow Section with Full Background */}
         <section className="workflow-section scroll-reveal" id="workflow">
           <div className="workflow-copy">
-            <p className="eyebrow accent-eyebrow"><span className="eyebrow-line" /> 02 / SIGNALS → ACTION</p>
-            <h2>From a wet hillside<br /><em>to a clear next step.</em></h2>
-            <p>Designed to make complex terrain legible at the moment it matters—not bury your response team in another dashboard.</p>
+            <p className="eyebrow accent-eyebrow reveal-text"><span className="eyebrow-line" /> 02 / SIGNALS → ACTION</p>
+            <h2 className="reveal-text reveal-delay-1">From a wet hillside<br /><em className="text-shimmer">to a clear next step.</em></h2>
+            <p className="reveal-text reveal-delay-2">Designed to make complex terrain legible at the moment it matters—not bury your response team in another dashboard.</p>
             <div className="workflow-steps">
-              <div><span>01</span><strong>Read the rain.</strong><p>Rain gauges, soil moisture, satellite context, and local weather patterns create a living baseline.</p></div>
-              <div><span>02</span><strong>Model the risk.</strong><p>Random Forest and XGBoost signals combine rolling rainfall, terrain, saturation, and past-event patterns.</p></div>
-              <div><span>03</span><strong>Alert the right people.</strong><p>Risk areas appear on a live map, with SMS, web, and response-team notifications ready for action.</p></div>
+              <div className="reveal-item reveal-delay-1"><span>01</span><strong>Read the rain.</strong><p>Rain gauges, soil moisture, satellite context, and local weather patterns create a living baseline.</p></div>
+              <div className="reveal-item reveal-delay-2"><span>02</span><strong>Model the risk.</strong><p>Random Forest and XGBoost signals combine rolling rainfall, terrain, saturation, and past-event patterns.</p></div>
+              <div className="reveal-item reveal-delay-3"><span>03</span><strong>Alert the right people.</strong><p>Risk areas appear on a live map, with SMS, web, and response-team notifications ready for action.</p></div>
             </div>
           </div>
           <div className="workflow-image" />
@@ -169,29 +169,29 @@ export default function Home() {
         {/* Risk Level Section */}
         <section className="risk-level-section scroll-reveal" id="risk-levels">
           <div className="risk-level-copy">
-            <p className="eyebrow accent-eyebrow"><span className="eyebrow-line" /> 03 / FOR RESPONSE TEAMS</p>
-            <h2>Clarity for the people<br />who have to <em>move first.</em></h2>
-            <p className="section-intro">The hardest part is not collecting data. It is turning a changing slope into enough time to prepare, respond, and move to safety.</p>
+            <p className="eyebrow accent-eyebrow reveal-text"><span className="eyebrow-line" /> 03 / FOR RESPONSE TEAMS</p>
+            <h2 className="reveal-text reveal-delay-1">Clarity for the people<br />who have to <em className="text-shimmer">move first.</em></h2>
+            <p className="section-intro reveal-text reveal-delay-2">The hardest part is not collecting data. It is turning a changing slope into enough time to prepare, respond, and move to safety.</p>
           </div>
           <div className="risk-level-list">
-            <div className="level-item level-low"><span>01</span><div><strong>Low</strong><p>Routine monitoring</p></div></div>
-            <div className="level-item level-moderate"><span>02</span><div><strong>Moderate</strong><p>Stay informed</p></div></div>
-            <div className="level-item level-high"><span>03</span><div><strong>High</strong><p>Prepare to respond</p></div></div>
-            <div className="level-item level-critical"><span>04</span><div><strong>Critical</strong><p>Act now</p></div></div>
+            <div className="level-item level-low reveal-item reveal-delay-1"><span>01</span><div><strong>Low</strong><p>Routine monitoring</p></div></div>
+            <div className="level-item level-moderate reveal-item reveal-delay-2"><span>02</span><div><strong>Moderate</strong><p>Stay informed</p></div></div>
+            <div className="level-item level-high reveal-item reveal-delay-3"><span>03</span><div><strong>High</strong><p>Prepare to respond</p></div></div>
+            <div className="level-item level-critical reveal-item reveal-delay-4"><span>04</span><div><strong>Critical</strong><p>Act now</p></div></div>
           </div>
         </section>
 
         {/* Field Note Section */}
         <section className="field-note-section scroll-reveal" id="field-note">
           <div className="field-note-copy">
-            <p className="eyebrow">04 / THE FIELD NOTE</p>
-            <h2>Read the risk.<br /><em>Ready the response.</em></h2>
-            <p>Affordable sensor nodes, open mapping, weather APIs, and local context become more useful when the interface answers one question clearly: what should we do next?</p>
-            <button className="text-link" onClick={() => navigate(isAuthenticated ? "/dashboard" : "/login")}>
+            <p className="eyebrow reveal-text">04 / THE FIELD NOTE</p>
+            <h2 className="reveal-text reveal-delay-1">Read the risk.<br /><em className="text-shimmer">Ready the response.</em></h2>
+            <p className="reveal-text reveal-delay-2">Affordable sensor nodes, open mapping, weather APIs, and local context become more useful when the interface answers one question clearly: what should we do next?</p>
+            <button className="text-link reveal-text reveal-delay-3" onClick={() => navigate(isAuthenticated ? "/dashboard" : "/login")}>
               Open Dashboard <ArrowUpRight size={14} />
             </button>
           </div>
-          <div className="terrain-study rounded-xl border border-border/40 shadow-xl" style={{ backgroundImage: "url('/images/geoalert-field-note-mini.png')" }}>
+          <div className="terrain-study rounded-xl border border-border/40 shadow-xl reveal-item reveal-delay-2" style={{ backgroundImage: "url('/images/geoalert-field-note-mini.png')" }}>
             <div className="terrain-study-overlay" />
             <span className="study-label">SENSOR FIELD TELEMETRY</span>
             <span className="study-coordinates">27.4728° N, 94.9120° E · ELEV. 1,420M</span>
