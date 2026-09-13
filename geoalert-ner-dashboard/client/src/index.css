@@ -103,8 +103,25 @@
 }
 
 * { border-color: var(--border); outline-color: color-mix(in srgb, var(--ring) 50%, transparent); }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
 body { background-color: var(--background); color: var(--foreground); margin: 0; min-width: 320px; font-family: var(--font-sans); }
+
+/* Scroll Reveal & Smooth Animation Utilities */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(35px);
+  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.scroll-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.scroll-reveal-delay-1 { transition-delay: 150ms; }
+.scroll-reveal-delay-2 { transition-delay: 300ms; }
+.scroll-reveal-delay-3 { transition-delay: 450ms; }
 button:not(:disabled), [role="button"]:not([aria-disabled="true"]), [type="button"]:not(:disabled), [type="submit"]:not(:disabled), a[href], select:not(:disabled) { cursor: pointer; }
 ::selection { background: var(--ochre); color: var(--forest-950); }
 

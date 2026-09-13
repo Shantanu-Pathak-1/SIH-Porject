@@ -1,5 +1,5 @@
 // GeoAlert Landing Page: Clean, modern climate-tech surface for North-East India landslide early warning.
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Activity, ArrowDownRight, ArrowUpRight, ChevronRight, Layers3, Moon, Radio, ShieldAlert, Sun } from "lucide-react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
@@ -17,91 +17,134 @@ export default function Home() {
 
   const selected = districts.find((d) => d.id === selectedId) || districts[0];
 
+  useEffect(() => {
+    const observerCallback: IntersectionObserverCallback = (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+        }
+      });
+    };
+
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: "0px 0px -40px 0px",
+    };
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+    const revealElements = document.querySelectorAll(".scroll-reveal");
+    revealElements.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="app-shell">
-      {/* Completely Transparent Top Header - No Border, Pure Clean */}
-      <header className="topbar">
-        <a className="brand-lockup flex items-center gap-3" href="#top" aria-label="GeoAlert home">
-          <img src="/logo.png" alt="GeoAlert Logo" className="h-11 md:h-12 w-auto object-contain shrink-0 filter drop-shadow-md transition-transform hover:scale-105" />
-          <span className="flex flex-col">
-            <strong className="text-sm font-mono tracking-widest text-foreground font-bold">GEOALERT</strong>
-            <small className="text-[9px] font-mono text-emerald-400/80 tracking-wider">EARLY WARNING SYSTEM</small>
-          </span>
-        </a>
-
-        {/* Clean Nav Links */}
-        <nav className="hidden md:flex items-center gap-8">
-          <a href="#top" className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-emerald-400 transition-colors">Overview</a>
-          <a href="#workflow" className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-emerald-400 transition-colors">Workflow</a>
-          <a href="#risk-levels" className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-emerald-400 transition-colors">Risk Levels</a>
-          <a href="#field-note" className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-emerald-400 transition-colors">Field Note</a>
-        </nav>
-
-        <div className="top-actions flex items-center gap-3">
-          {/* Stylish Theme Toggle Button */}
-          <button
-            onClick={toggleTheme}
-            className="h-8 w-8 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 hover:scale-105 flex items-center justify-center transition-all shadow-sm cursor-pointer"
-            aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-            title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+      {/* Top Hero Container with Video Background */}
+      <div className="relative overflow-hidden bg-forest-950">
+        {/* Background Video Layer */}
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover opacity-35 filter brightness-90 contrast-110 scale-105"
           >
-            {theme === "dark" ? <Sun size={15} className="text-amber-400" /> : <Moon size={15} className="text-emerald-300" />}
-          </button>
-
-          {/* Compact Sleek Open Dashboard Button */}
-          <button
-            onClick={() => navigate(isAuthenticated ? "/dashboard" : "/login")}
-            className="h-8 px-3.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1.5 transition-all shadow-sm hover:shadow-emerald-500/20 active:scale-95 cursor-pointer"
-          >
-            Open Dashboard <ArrowUpRight size={14} />
-          </button>
+            <source src="/videos/hero-bg.mp4" type="video/mp4" />
+            <source src="/hero-bg.mp4" type="video/mp4" />
+          </video>
+          {/* Subtle gradient overlays for pristine readability */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#082a27]/85 via-[#082a27]/55 to-[#082a27]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#082a27]/40 to-[#082a27]/90" />
         </div>
-      </header>
 
-      <main id="top">
-        {/* Full Viewport Hero Section */}
-        <section className="hero-section">
-          <div className="hero-copy">
-            <p className="eyebrow accent-eyebrow"><span className="eyebrow-line" /> AI + GIS EARLY WARNING · NER</p>
-            <h1>Know the slope<br /><em>before</em> it moves.</h1>
-            <p className="hero-description">GeoAlert turns rainfall, terrain, satellite context, and live sensor signals into a clear window for action across North-East India.</p>
-            <div className="hero-actions">
-              <button
-                className="h-9 px-4.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-[11px] uppercase tracking-wider font-semibold flex items-center gap-2 transition-all shadow-md hover:shadow-emerald-500/25 active:scale-95 cursor-pointer"
-                onClick={() => navigate(isAuthenticated ? "/dashboard" : "/login")}
-              >
-                Open Dashboard <ArrowUpRight size={15} />
-              </button>
-              <a className="secondary-cta !h-9 !px-4 !text-[11px] !rounded-md" href="#workflow">Explore System <ChevronRight size={14} /></a>
-            </div>
-            <div className="hero-meta">
-              <span><ShieldAlert size={13} /> Built for response teams</span>
-              <span><Radio size={13} /> Works through network loss</span>
-            </div>
+        {/* Completely Transparent Top Header - No Border, Pure Clean */}
+        <header className="topbar relative z-10">
+          <a className="brand-lockup flex items-center gap-3" href="#top" aria-label="GeoAlert home">
+            <img src="/logo.png" alt="GeoAlert Logo" className="h-11 md:h-12 w-auto object-contain shrink-0 filter drop-shadow-md transition-transform hover:scale-105" />
+            <span className="flex flex-col">
+              <strong className="text-sm font-mono tracking-widest text-foreground font-bold">GEOALERT</strong>
+              <small className="text-[9px] font-mono text-emerald-400/80 tracking-wider">EARLY WARNING SYSTEM</small>
+            </span>
+          </a>
+
+          {/* Clean Nav Links */}
+          <nav className="hidden md:flex items-center gap-8">
+            <a href="#top" className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-emerald-400 transition-colors">Overview</a>
+            <a href="#workflow" className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-emerald-400 transition-colors">Workflow</a>
+            <a href="#risk-levels" className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-emerald-400 transition-colors">Risk Levels</a>
+            <a href="#field-note" className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-emerald-400 transition-colors">Field Note</a>
+          </nav>
+
+          <div className="top-actions flex items-center gap-3">
+            {/* Stylish Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className="h-8 w-8 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 hover:scale-105 flex items-center justify-center transition-all shadow-sm cursor-pointer"
+              aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+              title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+            >
+              {theme === "dark" ? <Sun size={15} className="text-amber-400" /> : <Moon size={15} className="text-emerald-300" />}
+            </button>
+
+            {/* Compact Sleek Open Dashboard Button */}
+            <button
+              onClick={() => navigate(isAuthenticated ? "/dashboard" : "/login")}
+              className="h-8 px-3.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1.5 transition-all shadow-sm hover:shadow-emerald-500/20 active:scale-95 cursor-pointer"
+            >
+              Open Dashboard <ArrowUpRight size={14} />
+            </button>
           </div>
+        </header>
 
-          {/* Hero Visual Card with Live Short Map */}
-          <div className="hero-visual" aria-label="Interactive North-East region risk map preview">
-            <div className="hero-risk-card">
-              <div className="card-topline">
-                <span><Layers3 size={14} /> Interactive Regional Map</span>
-                <span className="muted-label"><span className="tiny-live-dot" /> Click a district</span>
+        <main id="top" className="relative z-10">
+          {/* Full Viewport Hero Section */}
+          <section className="hero-section">
+            <div className="hero-copy">
+              <p className="eyebrow accent-eyebrow"><span className="eyebrow-line" /> AI + GIS EARLY WARNING · NER</p>
+              <h1>Know the slope<br /><em>before</em> it moves.</h1>
+              <p className="hero-description">GeoAlert turns rainfall, terrain, satellite context, and live sensor signals into a clear window for action across North-East India.</p>
+              <div className="hero-actions">
+                <button
+                  className="h-9 px-4.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-[11px] uppercase tracking-wider font-semibold flex items-center gap-2 transition-all shadow-md hover:shadow-emerald-500/25 active:scale-95 cursor-pointer"
+                  onClick={() => navigate(isAuthenticated ? "/dashboard" : "/login")}
+                >
+                  Open Dashboard <ArrowUpRight size={15} />
+                </button>
+                <a className="secondary-cta !h-9 !px-4 !text-[11px] !rounded-md" href="#workflow">Explore System <ChevronRight size={14} /></a>
               </div>
-              <div className="hero-map-shell">
-                <GeoRiskMap districts={districts} selectedId={selectedId} onSelectDistrict={setSelectedId} />
-              </div>
-              <div className="hero-risk-stats">
-                <div><span>RISK INDEX</span><strong>{selected.riskIndex.toFixed(2)}<small> / 1.00</small></strong></div>
-                <div><span>SENSORS LIVE</span><strong>{selected.sensorCount.split("/")[0].trim()}<small> / {selected.sensorCount.split("/")[1]?.trim()}</small></strong></div>
-                <div><span>LEAD TIME</span><strong>{selected.leadTime}</strong></div>
+              <div className="hero-meta">
+                <span><ShieldAlert size={13} /> Built for response teams</span>
+                <span><Radio size={13} /> Works through network loss</span>
               </div>
             </div>
-            <span className="scroll-note">SCROLL TO READ SYSTEM WORKFLOW <ArrowDownRight size={14} /></span>
-          </div>
-        </section>
 
+            {/* Hero Visual Card with Live Short Map */}
+            <div className="hero-visual" aria-label="Interactive North-East region risk map preview">
+              <div className="hero-risk-card">
+                <div className="card-topline">
+                  <span><Layers3 size={14} /> Interactive Regional Map</span>
+                  <span className="muted-label"><span className="tiny-live-dot" /> Click a district</span>
+                </div>
+                <div className="hero-map-shell">
+                  <GeoRiskMap districts={districts} selectedId={selectedId} onSelectDistrict={setSelectedId} />
+                </div>
+                <div className="hero-risk-stats">
+                  <div><span>RISK INDEX</span><strong>{selected.riskIndex.toFixed(2)}<small> / 1.00</small></strong></div>
+                  <div><span>SENSORS LIVE</span><strong>{selected.sensorCount.split("/")[0].trim()}<small> / {selected.sensorCount.split("/")[1]?.trim()}</small></strong></div>
+                  <div><span>LEAD TIME</span><strong>{selected.leadTime}</strong></div>
+                </div>
+              </div>
+              <span className="scroll-note">SCROLL TO READ SYSTEM WORKFLOW <ArrowDownRight size={14} /></span>
+            </div>
+          </section>
+        </main>
+      </div>
+
+      <div>
         {/* Signal Band */}
-        <section className="signal-band">
+        <section className="signal-band scroll-reveal">
           <div className="signal-lead"><p className="eyebrow">THE IDEA IN BRIEF</p><strong>Signals become time.<br /><em>Time becomes safer decisions.</em></strong></div>
           <div className="signal-stat"><strong>07</strong><span>NER states in scope</span></div>
           <div className="signal-stat"><strong>03</strong><span>core signal families</span></div>
@@ -109,7 +152,7 @@ export default function Home() {
         </section>
 
         {/* Workflow Section with Full Background */}
-        <section className="workflow-section" id="workflow">
+        <section className="workflow-section scroll-reveal" id="workflow">
           <div className="workflow-copy">
             <p className="eyebrow accent-eyebrow"><span className="eyebrow-line" /> 02 / SIGNALS → ACTION</p>
             <h2>From a wet hillside<br /><em>to a clear next step.</em></h2>
@@ -124,7 +167,7 @@ export default function Home() {
         </section>
 
         {/* Risk Level Section */}
-        <section className="risk-level-section" id="risk-levels">
+        <section className="risk-level-section scroll-reveal" id="risk-levels">
           <div className="risk-level-copy">
             <p className="eyebrow accent-eyebrow"><span className="eyebrow-line" /> 03 / FOR RESPONSE TEAMS</p>
             <h2>Clarity for the people<br />who have to <em>move first.</em></h2>
@@ -139,7 +182,7 @@ export default function Home() {
         </section>
 
         {/* Field Note Section */}
-        <section className="field-note-section" id="field-note">
+        <section className="field-note-section scroll-reveal" id="field-note">
           <div className="field-note-copy">
             <p className="eyebrow">04 / THE FIELD NOTE</p>
             <h2>Read the risk.<br /><em>Ready the response.</em></h2>
@@ -159,10 +202,10 @@ export default function Home() {
             </div>
           </div>
         </section>
-      </main>
+      </div>
 
       {/* Footer Redesign */}
-      <footer className="footer-redesign">
+      <footer className="footer-redesign scroll-reveal">
         <div className="footer-container">
           {/* Brand Column */}
           <div className="footer-brand-col">
