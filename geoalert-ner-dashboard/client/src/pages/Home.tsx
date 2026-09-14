@@ -49,10 +49,14 @@ export default function Home() {
             loop
             muted
             playsInline
+            preload="auto"
+            poster="/hero-poster.webp"
             className="w-full h-full object-cover opacity-70 filter brightness-105 contrast-105 scale-105 transition-all duration-700"
           >
-            <source src="/videos/hero-bg.mp4" type="video/mp4" />
+            <source src="/hero-bg.webm" type="video/webm" />
+            <source src="/videos/hero-bg.webm" type="video/webm" />
             <source src="/hero-bg.mp4" type="video/mp4" />
+            <source src="/videos/hero-bg.mp4" type="video/mp4" />
           </video>
           {/* Refined gradient overlays: Soft so video is clearly visible while text pops */}
           <div className="absolute inset-0 bg-gradient-to-b from-[#082a27]/55 via-[#082a27]/25 to-[#082a27]/85" />
