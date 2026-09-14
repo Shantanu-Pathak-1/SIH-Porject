@@ -9,15 +9,12 @@ export interface User {
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(() => {
+    const session = typeof window !== "undefined" ? localStorage.getItem("geoalert-session") : null;
+    if (!session) {
+      return null;
+    }
     const storedUser = localStorage.getItem("geoalert-user") || "District Operator";
     const storedRole = localStorage.getItem("geoalert-role") || "Disaster Management Authority";
-    
-    const session = localStorage.getItem("geoalert-session");
-    if (!session) {
-      localStorage.setItem("geoalert-session", "active");
-      localStorage.setItem("geoalert-user", storedUser);
-      localStorage.setItem("geoalert-role", storedRole);
-    }
 
     return {
       name: storedUser,

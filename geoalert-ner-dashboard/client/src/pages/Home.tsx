@@ -1,6 +1,6 @@
 // GeoAlert Landing Page: Clean, modern climate-tech surface for North-East India landslide early warning.
 import { useState, useEffect } from "react";
-import { Activity, ArrowDownRight, ArrowUpRight, ChevronRight, Layers3, Radio, ShieldAlert } from "lucide-react";
+import { Activity, ArrowDownRight, ArrowRight, ArrowUpRight, ChevronRight, Layers3, Lock, Radio, ShieldAlert, User } from "lucide-react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import GeoRiskMap from "@/components/GeoRiskMap";
@@ -81,13 +81,23 @@ export default function Home() {
             <a href="#field-note" className="text-xs font-mono uppercase tracking-wider text-white/75 hover:text-emerald-300 transition-colors">Field Note</a>
           </nav>
 
-          <div className="top-actions flex items-center gap-3">
+          <div className="top-actions flex items-center gap-2.5">
+            {/* Direct Login Button */}
+            <button
+              onClick={() => navigate("/login")}
+              className="h-9 px-3.5 rounded-md border border-white/20 bg-white/5 hover:bg-white/10 hover:border-amber-400 text-white font-mono text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1.5 transition-all shadow-sm active:scale-95 cursor-pointer"
+              title="Sign in to GeoAlert"
+            >
+              <User size={13} className="text-emerald-300" />
+              {isAuthenticated ? "Account" : "Log In"}
+            </button>
+
             {/* Sleek Open Dashboard Button */}
             <button
-              onClick={() => navigate(isAuthenticated ? "/dashboard" : "/login")}
-              className="h-9 px-4 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-[11px] uppercase tracking-wider font-semibold flex items-center gap-2 transition-all shadow-md hover:shadow-emerald-500/25 active:scale-95 cursor-pointer"
+              onClick={() => navigate("/dashboard")}
+              className="h-9 px-4 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1.5 transition-all shadow-md hover:shadow-emerald-500/25 active:scale-95 cursor-pointer"
             >
-              Open Dashboard <ArrowUpRight size={14} />
+              Dashboard <ArrowUpRight size={14} />
             </button>
           </div>
         </header>
@@ -99,12 +109,18 @@ export default function Home() {
               <p className="eyebrow accent-eyebrow !text-amber-400 font-semibold"><span className="eyebrow-line !bg-amber-400" /> AI + GIS EARLY WARNING · NER</p>
               <h1 className="!text-white font-bold">Know the slope<br /><em className="hero-highlight">before</em> it moves.</h1>
               <p className="hero-description !text-white/90">GeoAlert turns rainfall, terrain, satellite context, and live sensor signals into a clear window for action across North-East India.</p>
-              <div className="hero-actions">
+              <div className="hero-actions flex flex-wrap items-center gap-3">
                 <button
                   className="h-9 px-4.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-[11px] uppercase tracking-wider font-semibold flex items-center gap-2 transition-all shadow-md hover:shadow-emerald-500/25 active:scale-95 cursor-pointer"
-                  onClick={() => navigate(isAuthenticated ? "/dashboard" : "/login")}
+                  onClick={() => navigate("/login")}
                 >
-                  Open Dashboard <ArrowUpRight size={15} />
+                  <Lock size={13} className="text-emerald-200" /> Operator Login <ArrowRight size={14} />
+                </button>
+                <button
+                  className="h-9 px-4 rounded-md border border-white/25 bg-white/10 hover:bg-white/20 hover:border-emerald-400 text-white font-mono text-[11px] uppercase tracking-wider font-semibold flex items-center gap-2 transition-all cursor-pointer"
+                  onClick={() => navigate("/dashboard")}
+                >
+                  Open Dashboard <ArrowUpRight size={14} />
                 </button>
                 <a className="secondary-cta !h-9 !px-4 !text-[11px] !rounded-md !text-white !border-white/30 hover:!border-amber-400 hover:!text-amber-400 !bg-white/5" href="#workflow">Explore System <ChevronRight size={14} /></a>
               </div>
@@ -220,7 +236,8 @@ export default function Home() {
               <li><a href="#workflow">02 / Workflow & Signals</a></li>
               <li><a href="#risk-levels">03 / For Response Teams</a></li>
               <li><a href="#field-note">04 / The Field Note</a></li>
-              <li><button onClick={() => navigate(isAuthenticated ? "/dashboard" : "/login")}>Open Response Console →</button></li>
+              <li><button onClick={() => navigate("/login")}>Operator Login / Sign In →</button></li>
+              <li><button onClick={() => navigate("/dashboard")}>Open Response Console →</button></li>
             </ul>
           </div>
 
