@@ -51,8 +51,24 @@ export default function GeoRiskMap({ districts, selectedId, onSelectDistrict }: 
 
     mapRef.current = map;
     lastFocusedIdRef.current = selectedId;
-    window.setTimeout(() => map.invalidateSize(), 80);
+
+    const t1 = window.setTimeout(() => map.invalidateSize(), 60);
+    const t2 = window.setTimeout(() => map.invalidateSize(), 250);
+    const t3 = window.setTimeout(() => map.invalidateSize(), 600);
+
+    let resizeObserver: ResizeObserver | null = null;
+    if (mapElement.current && typeof ResizeObserver !== "undefined") {
+      resizeObserver = new ResizeObserver(() => {
+        map.invalidateSize();
+      });
+      resizeObserver.observe(mapElement.current);
+    }
+
     return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      window.clearTimeout(t3);
+      resizeObserver?.disconnect();
       map.remove();
       mapRef.current = null;
       markersRef.current = {};
@@ -80,5 +96,21 @@ export default function GeoRiskMap({ districts, selectedId, onSelectDistrict }: 
     return () => window.clearTimeout(focusTimer);
   }, [selectedId]);
 
-  return <div className="leaflet-map-shell"><div ref={mapElement} className="leaflet-map" /><div className="map-legend"><span><i className="legend-dot legend-low" /> Safe</span><span><i className="legend-dot legend-moderate" /> Moderate</span><span><i className="legend-dot legend-high" /> High</span><span><i className="legend-dot legend-critical" /> Critical</span></div><div className="map-context-note"><span>ESRI Satellite basemap</span><span>Risk heatmap layer</span><span>Scale in km</span></div><div className="map-attribution">Tiles © Esri · Earthstar Geographics</div></div>;
+  return (
+    <div className="leaflet-map-shell w-full h-full relative" style={{ width: "100%", height: "100%", minHeight: "270px" }}>
+      <div ref={mapElement} className="leaflet-map w-full h-full" style={{ width: "100%", height: "100%", minHeight: "270px", position: "absolute", inset: 0 }} />
+      <div className="map-legend">
+        <span><i className="legend-dot legend-low" /> Safe</span>
+        <span><i className="legend-dot legend-moderate" /> Moderate</span>
+        <span><i className="legend-dot legend-high" /> High</span>
+        <span><i className="legend-dot legend-critical" /> Critical</span>
+      </div>
+      <div className="map-context-note">
+        <span>ESRI Satellite basemap</span>
+        <span>Risk heatmap layer</span>
+        <span>Scale in km</span>
+      </div>
+      <div className="map-attribution">Tiles © Esri · Earthstar Geographics</div>
+    </div>
+  );
 }

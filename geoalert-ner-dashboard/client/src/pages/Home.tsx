@@ -1,14 +1,12 @@
 // GeoAlert Landing Page: Clean, modern climate-tech surface for North-East India landslide early warning.
 import { useState, useEffect } from "react";
-import { Activity, ArrowDownRight, ArrowUpRight, ChevronRight, Layers3, Moon, Radio, ShieldAlert, Sun } from "lucide-react";
+import { Activity, ArrowDownRight, ArrowUpRight, ChevronRight, Layers3, Radio, ShieldAlert } from "lucide-react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
-import { useTheme } from "@/contexts/ThemeContext";
 import GeoRiskMap from "@/components/GeoRiskMap";
 import { defaultDistricts, type DistrictId } from "@/lib/districtsData";
 
 export default function Home() {
-  const { theme, toggleTheme } = useTheme();
   const auth = useAuth();
   const [, navigate] = useLocation();
   const isAuthenticated = auth.isAuthenticated;
@@ -22,13 +20,15 @@ export default function Home() {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           entry.target.classList.add("is-visible");
+        } else {
+          entry.target.classList.remove("is-visible");
         }
       });
     };
 
     const observerOptions = {
-      threshold: 0.1,
-      rootMargin: "0px 0px -40px 0px",
+      threshold: 0.08,
+      rootMargin: "0px 0px -20px 0px",
     };
 
     const observer = new IntersectionObserver(observerCallback, observerOptions);
@@ -40,7 +40,7 @@ export default function Home() {
 
   return (
     <div className="app-shell">
-      {/* Top Hero Container with Video Background - Locked Dark Theme Aesthetic regardless of site theme */}
+      {/* Top Hero Container with Video Background - Pure Dark Climate-Tech Aesthetic */}
       <div className="relative overflow-hidden bg-[#082a27]">
         {/* Background Video Layer - High Visibility & Vibrancy */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
@@ -78,20 +78,10 @@ export default function Home() {
           </nav>
 
           <div className="top-actions flex items-center gap-3">
-            {/* Stylish Theme Toggle Button */}
-            <button
-              onClick={toggleTheme}
-              className="h-8 w-8 rounded-full bg-white/10 border border-white/20 text-amber-300 hover:bg-white/20 hover:scale-105 flex items-center justify-center transition-all shadow-sm cursor-pointer"
-              aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-              title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-            >
-              {theme === "dark" ? <Sun size={15} className="text-amber-400" /> : <Moon size={15} className="text-white" />}
-            </button>
-
-            {/* Compact Sleek Open Dashboard Button */}
+            {/* Sleek Open Dashboard Button */}
             <button
               onClick={() => navigate(isAuthenticated ? "/dashboard" : "/login")}
-              className="h-8 px-3.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1.5 transition-all shadow-sm hover:shadow-emerald-500/20 active:scale-95 cursor-pointer"
+              className="h-9 px-4 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-[11px] uppercase tracking-wider font-semibold flex items-center gap-2 transition-all shadow-md hover:shadow-emerald-500/25 active:scale-95 cursor-pointer"
             >
               Open Dashboard <ArrowUpRight size={14} />
             </button>
@@ -121,22 +111,19 @@ export default function Home() {
             </div>
 
             {/* Hero Visual Card with Live Short Map */}
-            <div className="hero-visual" aria-label="Interactive North-East region risk map preview">
-              <div className="hero-risk-card">
-                <div className="card-topline">
-                  <span><Layers3 size={14} /> Interactive Regional Map</span>
-                  <span className="muted-label"><span className="tiny-live-dot" /> Click a district</span>
-                </div>
-                <div className="hero-map-shell">
-                  <GeoRiskMap districts={districts} selectedId={selectedId} onSelectDistrict={setSelectedId} />
-                </div>
-                <div className="hero-risk-stats">
-                  <div><span>RISK INDEX</span><strong>{selected.riskIndex.toFixed(2)}<small> / 1.00</small></strong></div>
-                  <div><span>SENSORS LIVE</span><strong>{selected.sensorCount.split("/")[0].trim()}<small> / {selected.sensorCount.split("/")[1]?.trim()}</small></strong></div>
-                  <div><span>LEAD TIME</span><strong>{selected.leadTime}</strong></div>
-                </div>
+            <div className="hero-risk-card" aria-label="Interactive North-East region risk map preview">
+              <div className="card-topline">
+                <span><Layers3 size={14} /> Interactive Regional Map</span>
+                <span className="muted-label"><span className="tiny-live-dot" /> Click a district</span>
               </div>
-              <span className="scroll-note">SCROLL TO READ SYSTEM WORKFLOW <ArrowDownRight size={14} /></span>
+              <div className="hero-map-shell">
+                <GeoRiskMap districts={districts} selectedId={selectedId} onSelectDistrict={setSelectedId} />
+              </div>
+              <div className="hero-risk-stats">
+                <div><span>RISK INDEX</span><strong>{selected.riskIndex.toFixed(2)}<small> / 1.00</small></strong></div>
+                <div><span>SENSORS LIVE</span><strong>{selected.sensorCount.split("/")[0].trim()}<small> / {selected.sensorCount.split("/")[1]?.trim()}</small></strong></div>
+                <div><span>LEAD TIME</span><strong>{selected.leadTime}</strong></div>
+              </div>
             </div>
           </section>
         </main>
