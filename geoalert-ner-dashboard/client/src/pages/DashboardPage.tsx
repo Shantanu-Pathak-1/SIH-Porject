@@ -4,7 +4,7 @@ import DashboardLayout from "@/components/DashboardLayout";
 import GeoRiskMap from "@/components/GeoRiskMap";
 import TrendCharts from "@/components/TrendCharts";
 import SensorNodeAnalytics from "@/components/SensorNodeAnalytics";
-import { BroadcastHistory, OfflineTerminal, type BroadcastHistoryItem } from "@/components/OpsPanels";
+import { BroadcastHistory, type BroadcastHistoryItem } from "@/components/OpsPanels";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { clampTelemetry } from "@/lib/geoalert";
@@ -114,7 +114,7 @@ export default function DashboardPage() {
           <div>
             <div className="flex items-center gap-2 text-xs font-mono text-emerald-500 uppercase tracking-wider mb-1">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              SIH26001 / OPERATOR RESPONSE CONSOLE
+              GEOALERT-NER / COMMAND & RESPONSE CONSOLE
             </div>
             <h1 className="text-2xl font-serif font-bold text-foreground">
               District Command Surface
@@ -211,9 +211,8 @@ export default function DashboardPage() {
 
           <TrendCharts district={selected} theme={theme} />
           <SensorNodeAnalytics district={selected} lastUpdated={lastUpdated} networkOnline={networkSensors.online} networkTotal={networkSensors.total} />
-          <div className="ops-grid">
+          <div className="ops-grid !grid-cols-1">
             <BroadcastHistory history={broadcastHistory} onOpenBroadcast={openBroadcast} />
-            <OfflineTerminal />
           </div>
         </section>
       </div>

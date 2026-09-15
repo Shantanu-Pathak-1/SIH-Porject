@@ -1,6 +1,6 @@
 // GeoAlert Landing Page: Clean, modern climate-tech surface for North-East India landslide early warning.
-import { useState, useEffect } from "react";
-import { Activity, ArrowDownRight, ArrowRight, ArrowUpRight, ChevronRight, Layers3, Lock, Radio, ShieldAlert, User } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Activity, ArrowDownRight, ArrowRight, ArrowUpRight, ChevronDown, ChevronRight, Layers3, Lock, LogIn, LogOut, MapPin, Radio, ShieldAlert, User } from "lucide-react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import GeoRiskMap from "@/components/GeoRiskMap";
@@ -14,6 +14,38 @@ export default function Home() {
   const [selectedId, setSelectedId] = useState<DistrictId>("tawang");
 
   const selected = districts.find((d) => d.id === selectedId) || districts[0];
+
+  // Topbar Account popover state (hover and click)
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const accountMenuRef = useRef<HTMLDivElement>(null);
+  const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleMouseEnter = () => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+    setIsAccountOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    closeTimerRef.current = setTimeout(() => {
+      setIsAccountOpen(false);
+    }, 250);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (accountMenuRef.current && !accountMenuRef.current.contains(event.target as Node)) {
+        setIsAccountOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     const observerCallback: IntersectionObserverCallback = (entries) => {
@@ -81,16 +113,140 @@ export default function Home() {
             <a href="#field-note" className="text-xs font-mono uppercase tracking-wider text-white/75 hover:text-emerald-300 transition-colors">Field Note</a>
           </nav>
 
-          <div className="top-actions flex items-center gap-2.5">
-            {/* Direct Login / Sign Up Button */}
-            <button
-              onClick={() => navigate("/login")}
-              className="h-9 px-3.5 rounded-md border border-white/20 bg-white/5 hover:bg-white/10 hover:border-amber-400 text-white font-mono text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1.5 transition-all shadow-sm active:scale-95 cursor-pointer"
-              title="Sign in to GeoAlert"
+          <div className="top-actions flex items-center gap-2.5 relative">
+            {/* Account / Login Interactive Popover Container */}
+            <div
+              ref={accountMenuRef}
+              className="relative"
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
             >
-              <User size={13} className="text-emerald-300" />
-              {isAuthenticated ? "Account" : "Login / Sign Up"}
-            </button>
+              <button
+                onClick={() => setIsAccountOpen((prev) => !prev)}
+                className={`h-9 px-3 rounded-md border ${
+                  isAccountOpen
+                    ? "border-emerald-400 bg-emerald-500/20 text-emerald-200"
+                    : "border-white/20 bg-white/5 hover:bg-white/10 hover:border-emerald-400 text-white"
+                } font-mono text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1.5 transition-all shadow-sm active:scale-95 cursor-pointer`}
+                title="Account Options"
+              >
+                <User size={13} className={isAuthenticated ? "text-emerald-400" : "text-emerald-300"} />
+                <span>{isAuthenticated ? (auth.user?.name?.split(" ")[0] || "Account") : "Account"}</span>
+                <ChevronDown
+                  size={12}
+                  className={`transition-transform duration-200 opacity-70 ${isAccountOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+
+              {/* Dropdown Popup directly below the topbar button */}
+              {isAccountOpen && (
+                <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 rounded-2xl bg-[#092d29]/95 backdrop-blur-2xl border border-emerald-500/30 shadow-2xl shadow-black/80 p-4 text-white z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                  {isAuthenticated ? (
+                    <div className="space-y-3">
+                      {/* Active Session Status */}
+                      <div className="flex items-center justify-between pb-2.5 border-b border-white/10">
+                        <div className="flex items-center gap-2">
+                          <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                          <span className="text-[11px] font-mono uppercase tracking-wider text-emerald-300 font-semibold">
+                            Active Session
+                          </span>
+                        </div>
+                        <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                          {auth.user?.role?.includes("Operator") ? "Operator" : "Logged In"}
+                        </span>
+                      </div>
+
+                      {/* User Info (Name, Gmail, Location) */}
+                      <div className="flex items-start gap-3 py-1">
+                        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-500/30 to-teal-700/30 border border-emerald-400/40 flex items-center justify-center text-emerald-200 font-bold shrink-0 text-base shadow-inner">
+                          {auth.user?.name ? auth.user.name.charAt(0).toUpperCase() : "U"}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-semibold text-white truncate" title={auth.user?.name || "District Operator"}>
+                            {auth.user?.name || "District Operator"}
+                          </p>
+                          <p className="text-[11px] font-mono text-emerald-200/80 truncate mt-0.5" title={auth.user?.email || "operator@gmail.com"}>
+                            {auth.user?.email || "operator@gmail.com"}
+                          </p>
+                          {(auth.user?.district || auth.user?.state) && (
+                            <p className="text-[10px] text-white/60 flex items-center gap-1 mt-1 truncate">
+                              <MapPin size={10} className="text-emerald-400 shrink-0" />
+                              {[auth.user.district, auth.user.state].filter(Boolean).join(", ")}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Action buttons */}
+                      <div className="pt-2.5 border-t border-white/10 space-y-1.5">
+                        <button
+                          onClick={() => {
+                            setIsAccountOpen(false);
+                            navigate("/dashboard");
+                          }}
+                          className="w-full h-8 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-[11px] uppercase tracking-wider font-semibold flex items-center justify-center gap-2 transition-all shadow cursor-pointer"
+                        >
+                          Open Dashboard <ArrowUpRight size={13} />
+                        </button>
+                        <button
+                          onClick={() => {
+                            setIsAccountOpen(false);
+                            auth.logout();
+                          }}
+                          className="w-full h-8 px-3 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-300 hover:text-red-200 border border-red-500/30 font-mono text-[11px] uppercase tracking-wider font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer"
+                        >
+                          <LogOut size={13} /> Sign Out
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {/* Guest / Not Logged In Header */}
+                      <div className="flex items-center justify-between pb-2.5 border-b border-white/10">
+                        <div className="flex items-center gap-2">
+                          <span className="h-2 w-2 rounded-full bg-amber-400" />
+                          <span className="text-[11px] font-mono uppercase tracking-wider text-amber-300 font-semibold">
+                            Not Logged In
+                          </span>
+                        </div>
+                        <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                          Guest User
+                        </span>
+                      </div>
+
+                      {/* Brief text */}
+                      <div className="py-1">
+                        <p className="text-[11px] text-white/80 leading-relaxed">
+                          Aap abhi logged in nahi hain. Early warning alerts, live sensor data aur district telemetry controls ke liye login karein.
+                        </p>
+                      </div>
+
+                      {/* Sign In & Sign Up Options */}
+                      <div className="pt-2.5 border-t border-white/10 space-y-1.5">
+                        <button
+                          onClick={() => {
+                            setIsAccountOpen(false);
+                            navigate("/login");
+                          }}
+                          className="w-full h-8 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-[11px] uppercase tracking-wider font-semibold flex items-center justify-center gap-2 transition-all shadow cursor-pointer"
+                        >
+                          <LogIn size={13} /> Sign In / Log In
+                        </button>
+                        <button
+                          onClick={() => {
+                            setIsAccountOpen(false);
+                            navigate("/login");
+                          }}
+                          className="w-full h-8 px-3 rounded-lg bg-white/5 hover:bg-white/10 text-white/80 hover:text-white border border-white/15 font-mono text-[11px] uppercase tracking-wider font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                        >
+                          Create New Account
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
 
             {/* Sleek Open Dashboard Button */}
             <button

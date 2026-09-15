@@ -7,6 +7,9 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import DashboardPage from "./pages/DashboardPage";
 import LoginPage from "./pages/LoginPage";
+import MapViewPage from "./pages/MapViewPage";
+import HistoryPage from "./pages/HistoryPage";
+import BroadcastsPage from "./pages/BroadcastsPage";
 import NotFound from "./pages/NotFound";
 
 function Router() {
@@ -15,6 +18,9 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/login" component={LoginPage} />
       <Route path="/dashboard" component={DashboardPage} />
+      <Route path="/map" component={MapViewPage} />
+      <Route path="/history" component={HistoryPage} />
+      <Route path="/broadcasts" component={BroadcastsPage} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

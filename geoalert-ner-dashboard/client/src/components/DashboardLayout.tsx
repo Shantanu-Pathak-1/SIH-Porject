@@ -21,15 +21,18 @@ import {
 } from "@/components/ui/sidebar";
 import { startLogin } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { Home as HomeIcon, LayoutDashboard, LogOut, PanelLeft, ShieldAlert } from "lucide-react";
+import { BellRing, History, Home as HomeIcon, LayoutDashboard, LogOut, Map as MapIcon, PanelLeft, ShieldAlert } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Response Console", path: "/dashboard" },
-  { icon: HomeIcon, label: "Public Portal", path: "/" },
+  { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
+  { icon: MapIcon, label: "Full Map View", path: "/map" },
+  { icon: History, label: "History & Analytics", path: "/history" },
+  { icon: BellRing, label: "Emergency Broadcasts", path: "/broadcasts", isYellow: true },
+  { icon: HomeIcon, label: "Home Page", path: "/" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
@@ -82,6 +85,7 @@ export default function DashboardLayout({
 
   return (
     <SidebarProvider
+      defaultOpen={false}
       style={
         {
           "--sidebar-width": `${sidebarWidth}px`,
@@ -106,12 +110,37 @@ function DashboardLayoutContent({
 }: DashboardLayoutContentProps) {
   const { user, logout } = useAuth();
   const [location, setLocation] = useLocation();
-  const { state, toggleSidebar } = useSidebar();
+  const { state, setOpen, toggleSidebar } = useSidebar();
   const isCollapsed = state === "collapsed";
   const [isResizing, setIsResizing] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const activeMenuItem = menuItems.find(item => item.path === location);
   const isMobile = useIsMobile();
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleSidebarMouseEnter = () => {
+    if (isMobile) return;
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+    setOpen(true);
+  };
+
+  const handleSidebarMouseLeave = () => {
+    if (isMobile) return;
+    hoverTimeoutRef.current = setTimeout(() => {
+      setOpen(false);
+    }, 280);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (isCollapsed) {
@@ -130,7 +159,7 @@ function DashboardLayoutContent({
       }
     };
 
-    const handleMouseUp = () => {
+  const handleMouseUp = () => {
       setIsResizing(false);
     };
 
@@ -151,7 +180,12 @@ function DashboardLayoutContent({
 
   return (
     <>
-      <div className="relative" ref={sidebarRef}>
+      <div
+        className="relative group/sidebar-hover"
+        ref={sidebarRef}
+        onMouseEnter={handleSidebarMouseEnter}
+        onMouseLeave={handleSidebarMouseLeave}
+      >
         <Sidebar
           collapsible="icon"
           className="border-r-0"
@@ -186,12 +220,27 @@ function DashboardLayoutContent({
                       isActive={isActive}
                       onClick={() => setLocation(item.path)}
                       tooltip={item.label}
-                      className={`h-10 transition-all font-normal`}
+                      className={`h-10 transition-all font-medium ${
+                        item.isYellow
+                          ? isActive
+                            ? "bg-amber-500/25 text-amber-300 font-bold border border-amber-500/40"
+                            : "text-amber-400 hover:bg-amber-500/15 hover:text-amber-300 font-semibold"
+                          : ""
+                      }`}
                     >
                       <item.icon
-                        className={`h-4 w-4 ${isActive ? "text-primary" : ""}`}
+                        className={`h-4 w-4 shrink-0 ${
+                          item.isYellow
+                            ? "text-amber-400 animate-pulse"
+                            : isActive
+                            ? "text-emerald-400"
+                            : ""
+                        }`}
                       />
-                      <span>{item.label}</span>
+                      <span className="truncate">{item.label}</span>
+                      {item.isYellow && (
+                        <span className="h-2 w-2 rounded-full bg-amber-400 animate-ping ml-auto shrink-0 group-data-[collapsible=icon]:hidden" />
+                      )}
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );

@@ -848,3 +848,287 @@ a { color: inherit; text-decoration: none; }
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Dashboard Console Layout & Watchlist Styles */
+.console-layout {
+  display: grid;
+  grid-template-columns: 290px minmax(0, 1fr);
+  min-height: 520px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
+  border-radius: 8px;
+}
+@media (max-width: 1024px) {
+  .console-layout {
+    grid-template-columns: 1fr;
+  }
+}
+.console-sidebar {
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border);
+  background: var(--card);
+}
+.sidebar-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--muted-foreground);
+  font: 8px var(--font-mono);
+  letter-spacing: .13em;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+.district-list {
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+.district-row {
+  width: 100%;
+  padding: 12px 8px;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  background: transparent;
+  color: var(--foreground);
+  transition: background 180ms var(--ease-out), padding 180ms var(--ease-out);
+  cursor: pointer;
+}
+.district-row:hover {
+  background: var(--secondary);
+  padding-left: 12px;
+}
+.district-row-active {
+  background: rgba(16, 185, 129, 0.12) !important;
+  box-shadow: inset 3px 0 #10b981;
+  padding-left: 12px;
+}
+.district-marker {
+  width: 9px;
+  height: 9px;
+  border: 2px solid var(--card);
+  outline: 1px solid currentColor;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+.marker-low { background: #6eaa86; color: #6eaa86; }
+.marker-moderate { background: #d9aa48; color: #d9aa48; }
+.marker-high { background: #ee8b56; color: #ee8b56; }
+.marker-critical { background: #d75d52; color: #d75d52; }
+.district-row-copy {
+  flex: 1;
+  min-width: 0;
+}
+.district-row-copy strong,
+.district-row-copy small {
+  display: block;
+}
+.district-row-copy strong {
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.district-row-copy small {
+  font-size: 11px;
+  color: var(--muted-foreground);
+  margin-top: 1px;
+}
+.district-row-index {
+  font: 11px var(--font-mono);
+  color: #10b981;
+  font-weight: 600;
+}
+.sidebar-insight {
+  display: flex;
+  gap: 10px;
+  padding: 16px 0 0;
+  margin-top: auto;
+  border-top: 1px solid var(--border);
+}
+.insight-icon {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #10b981;
+  flex: 0 0 auto;
+  border-radius: 4px;
+}
+.sidebar-insight .eyebrow {
+  margin-bottom: 4px;
+  font-size: 9px;
+}
+.sidebar-insight strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+}
+.sidebar-insight p:last-child {
+  margin: 4px 0 0;
+  color: var(--muted-foreground);
+  font-size: 11px;
+  line-height: 1.4;
+}
+.map-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+}
+.map-card-header {
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 1px solid var(--border);
+}
+.map-card-header h3 {
+  margin: 0;
+  font: 500 24px var(--font-sans);
+  letter-spacing: -.02em;
+}
+.map-card-header h3 span {
+  color: var(--muted-foreground);
+  font-size: 16px;
+}
+.map-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.map-control-label {
+  font: 9px var(--font-mono);
+  letter-spacing: .08em;
+  color: var(--muted-foreground);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  display: inline-block;
+  animation: pulse-dot 2s infinite;
+}
+.map-footer {
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  color: var(--muted-foreground);
+  font: 9px var(--font-mono);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  display: flex;
+  gap: 18px;
+  background: var(--card);
+}
+.map-footer span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(260px, .65fr);
+  margin-top: 18px;
+  gap: 18px;
+}
+.detail-primary, .detail-action {
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 20px;
+  border-radius: 8px;
+}
+.detail-topline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.detail-topline .eyebrow {
+  margin: 0;
+}
+.detail-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.detail-title-row h3 {
+  margin: 0;
+  font: 500 26px var(--font-sans);
+  letter-spacing: -.02em;
+}
+.detail-title-row h3 em {
+  color: #10b981;
+  font-style: normal;
+}
+.detail-title-row p {
+  margin: 6px 0 0;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  max-width: 475px;
+  line-height: 1.45;
+}
+.risk-index {
+  text-align: right;
+}
+.risk-index span, .risk-index small {
+  display: block;
+  font: 8px var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--muted-foreground);
+}
+.risk-index strong {
+  font: 400 32px var(--font-mono);
+  color: var(--foreground);
+}
+.risk-index small {
+  display: inline;
+  margin-left: 4px;
+  font-size: 8px;
+}
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--border);
+  margin-top: 20px;
+  padding-top: 16px;
+  gap: 12px;
+}
+.metric-tile {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.metric-icon {
+  width: 31px;
+  height: 31px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  color: var(--muted-foreground);
+  border-radius: 4px;
+}
+.metric-tile.rain-tone .metric-icon { color: #5f9e8d; }
+.metric-tile.soil-tone .metric-icon { color: #d9aa48; }
+.metric-tile.lead-tone .metric-icon { color: #ee8b56; }
+.metric-value {
+  margin: 4px 0 0;
+  font: 18px var(--font-mono);
+}
+.metric-value span {
+  color: var(--muted-foreground);
+  font-size: 9px;
+}
+

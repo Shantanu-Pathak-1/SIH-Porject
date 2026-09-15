@@ -105,11 +105,6 @@ export default function GeoRiskMap({ districts, selectedId, onSelectDistrict }: 
         <span><i className="legend-dot legend-high" /> High</span>
         <span><i className="legend-dot legend-critical" /> Critical</span>
       </div>
-      <div className="map-context-note">
-        <span>ESRI Satellite basemap</span>
-        <span>Risk heatmap layer</span>
-        <span>Scale in km</span>
-      </div>
       <div className="map-attribution">Tiles © Esri · Earthstar Geographics</div>
     </div>
   );
