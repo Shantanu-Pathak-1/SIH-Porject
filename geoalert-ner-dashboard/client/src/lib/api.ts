@@ -17,20 +17,15 @@ export async function fetchApi<T>(endpoint: string, options?: RequestInit): Prom
     }
 
     if (!res.ok) {
-      let serverErrorMsg = "";
+      let errorText = "";
       try {
-        const textData = await res.text();
-        try {
-          const parsed = JSON.parse(textData);
-          serverErrorMsg = parsed.error || parsed.message;
-        } catch {
-          serverErrorMsg = textData;
-        }
+        const json = await res.json();
+        errorText = json?.error || json?.message || "";
       } catch {
-        // Ignore read error
+        // Not JSON
       }
 
-      throw new Error(serverErrorMsg || `Request failed with status code ${res.status}`);
+      throw new Error(errorText || `Request failed (${res.status})`);
     }
 
     return await res.json();
@@ -93,7 +88,8 @@ export const api = {
       });
       if (data?.user) return data.user;
     } catch (err: any) {
-      if (!err?.message?.includes("404") && !err?.message?.includes("status code 404")) {
+      const msg = err?.message || "";
+      if (msg.includes("An account already exists") || msg.includes("Name and Email are required")) {
         throw err;
       }
     }
@@ -127,7 +123,8 @@ export const api = {
       });
       if (data?.user) return data.user;
     } catch (err: any) {
-      if (!err?.message?.includes("404") && !err?.message?.includes("status code 404")) {
+      const msg = err?.message || "";
+      if (msg.includes("Incorrect password") || msg.includes("suspended") || msg.includes("Account not found")) {
         throw err;
       }
     }
