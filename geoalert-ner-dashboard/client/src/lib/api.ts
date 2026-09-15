@@ -17,14 +17,26 @@ export async function fetchApi<T>(endpoint: string, options?: RequestInit): Prom
     }
 
     if (!res.ok) {
-      const errData = await res.json().catch(() => ({}));
-      throw new Error(errData.error || "Authentication or server request failed.");
+      let serverErrorMsg = "";
+      try {
+        const textData = await res.text();
+        try {
+          const parsed = JSON.parse(textData);
+          serverErrorMsg = parsed.error || parsed.message;
+        } catch {
+          serverErrorMsg = textData;
+        }
+      } catch {
+        // Ignore read error
+      }
+
+      throw new Error(serverErrorMsg || `Request failed with status code ${res.status}`);
     }
 
     return await res.json();
   } catch (err: any) {
     if (err?.message === "Failed to fetch") {
-      throw new Error("Unable to connect to server. Please check your internet connection.");
+      throw new Error("Unable to connect to server. Please check your network connection.");
     }
     throw err;
   }
