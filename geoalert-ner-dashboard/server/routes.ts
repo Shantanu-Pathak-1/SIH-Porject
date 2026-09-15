@@ -19,7 +19,7 @@ apiRouter.post("/auth/register", async (req, res) => {
     const user = await dbStore.registerUser({ name, email, password, role, state, district });
     res.json({ success: true, user });
   } catch (error: any) {
-    res.status(500).json({ error: error.message || "Registration failed" });
+    res.status(400).json({ error: error.message || "Registration failed" });
   }
 });
 

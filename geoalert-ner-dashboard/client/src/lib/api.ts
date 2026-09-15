@@ -42,6 +42,40 @@ export async function fetchApi<T>(endpoint: string, options?: RequestInit): Prom
   }
 }
 
+// Local In-Memory Auth Fallback Store (for client-side or standalone dev execution)
+const localAuthUsers: User[] = [
+  {
+    id: "usr-01",
+    name: "Shantanu Pathak",
+    email: "shantanu.pathak@geoalert.gov.in",
+    password: "password123",
+    role: "Admin / Operator",
+    state: "Assam",
+    district: "Karbi Anglong (Diphu)",
+    status: "active",
+  },
+  {
+    id: "usr-02",
+    name: "District Collector Tawang",
+    email: "collector.tawang@arunachal.gov.in",
+    password: "password123",
+    role: "District Collector",
+    state: "Arunachal Pradesh",
+    district: "Tawang",
+    status: "active",
+  },
+  {
+    id: "usr-03",
+    name: "Field Officer Sohra",
+    email: "field.sohra@meghalaya.gov.in",
+    password: "password123",
+    role: "Field Engineer",
+    state: "Meghalaya",
+    district: "East Khasi Hills (Shillong)",
+    status: "active",
+  },
+];
+
 export const api = {
   // Auth
   register: async (payload: {
@@ -52,24 +86,87 @@ export const api = {
     state?: string;
     district?: string;
   }): Promise<User | null> => {
-    const data = await fetchApi<{ user: User }>("/auth/register", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    });
-    return data?.user || null;
+    try {
+      const data = await fetchApi<{ user: User }>("/auth/register", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+      if (data?.user) return data.user;
+    } catch (err: any) {
+      if (!err?.message?.includes("404") && !err?.message?.includes("status code 404")) {
+        throw err;
+      }
+    }
+
+    let existing = localAuthUsers.find((u) => u.email.toLowerCase() === payload.email.toLowerCase());
+    if (existing) {
+      throw new Error(`An account already exists with ${payload.email} (Registered as ${existing.role || "User"}). Please sign in instead.`);
+    }
+
+    const newUser: User = {
+      id: `usr-${Date.now()}`,
+      name: payload.name,
+      email: payload.email,
+      password: payload.password || "password123",
+      role: (payload.role as any) || "Citizen",
+      state: payload.state || "Assam",
+      district: payload.district || "Karbi Anglong (Diphu)",
+      status: "active",
+    };
+
+    localAuthUsers.push(newUser);
+    const { password, ...safeUser } = newUser;
+    return safeUser as User;
   },
 
   login: async (email: string, password?: string, role?: string, name?: string): Promise<User | null> => {
-    const data = await fetchApi<{ user: User }>("/auth/login", {
-      method: "POST",
-      body: JSON.stringify({ email, password, role, name }),
-    });
-    return data?.user || null;
+    try {
+      const data = await fetchApi<{ user: User }>("/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password, role, name }),
+      });
+      if (data?.user) return data.user;
+    } catch (err: any) {
+      if (!err?.message?.includes("404") && !err?.message?.includes("status code 404")) {
+        throw err;
+      }
+    }
+
+    let existing = localAuthUsers.find((u) => u.email.toLowerCase() === email.toLowerCase());
+    if (!existing) {
+      throw new Error(`Account not found for ${email}. Please check your email or click 'Create account' to register.`);
+    }
+
+    if (existing.status === "blocked") {
+      throw new Error(`Account (${email}) is suspended by system administrator.`);
+    }
+
+    if (password && existing.password && existing.password !== password) {
+      throw new Error("Incorrect password. Please try again.");
+    }
+
+    if (role) existing.role = role as any;
+    if (name) existing.name = name;
+
+    const { password: pwd, ...safeUser } = existing;
+    return safeUser as User;
   },
 
   getMe: async (email?: string): Promise<User | null> => {
-    const data = await fetchApi<{ user: User }>(`/auth/me${email ? `?email=${encodeURIComponent(email)}` : ""}`);
-    return data?.user || null;
+    if (!email) return null;
+    try {
+      const data = await fetchApi<{ user: User }>(`/auth/me?email=${encodeURIComponent(email)}`);
+      if (data?.user) return data.user;
+    } catch (err) {
+      // Ignore
+    }
+
+    const localUser = localAuthUsers.find((u) => u.email.toLowerCase() === email.toLowerCase());
+    if (localUser) {
+      const { password, ...safeUser } = localUser;
+      return safeUser as User;
+    }
+    return null;
   },
 
   updateProfile: async (payload: {
