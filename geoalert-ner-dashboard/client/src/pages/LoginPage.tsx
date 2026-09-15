@@ -18,7 +18,6 @@ import {
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
-import { startLogin } from "@/const";
 import { nerLocations, nerStateList } from "@/lib/nerLocationData";
 
 // Simplified to 2 primary roles: Citizen and Admin / Operator
@@ -713,8 +712,10 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => {
+                      localStorage.setItem("geoalert-session", "active");
                       localStorage.setItem("geoalert-role", role);
-                      startLogin();
+                      localStorage.setItem("geoalert-user", role === "Citizen" ? "Citizen User" : "District Operator");
+                      window.location.href = "/dashboard";
                     }}
                     className="w-full h-9 rounded-xl bg-white/5 hover:bg-white/10 border border-emerald-500/25 flex items-center justify-center gap-2 text-xs text-white transition-all hover:border-emerald-400/40 active:scale-[0.99] cursor-pointer"
                     title="Continue with Google"
