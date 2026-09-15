@@ -42,16 +42,60 @@ export function useAuth() {
     }
   }, []);
 
-  const loginWithBackend = async (email: string, role: string, name?: string) => {
-    const backendUser = await api.login(email, role, name);
+  const loginWithBackend = async (email: string, password?: string, role?: string, name?: string) => {
+    const backendUser = await api.login(email, password, role, name);
     if (backendUser) {
       localStorage.setItem("geoalert-session", "active");
-      localStorage.setItem("geoalert-user", backendUser.name);
-      localStorage.setItem("geoalert-role", backendUser.role);
-      localStorage.setItem("geoalert-email", backendUser.email);
+      localStorage.setItem("geoalert-user", backendUser.name || email.split("@")[0]);
+      localStorage.setItem("geoalert-role", backendUser.role || role || "Citizen");
+      localStorage.setItem("geoalert-email", backendUser.email || email);
+      if (backendUser.state) localStorage.setItem("geoalert-state", backendUser.state);
+      if (backendUser.district) localStorage.setItem("geoalert-district", backendUser.district);
       setUser(backendUser);
     }
     return backendUser;
+  };
+
+  const registerWithBackend = async (payload: {
+    name: string;
+    email: string;
+    password?: string;
+    role?: string;
+    state?: string;
+    district?: string;
+  }) => {
+    const backendUser = await api.register(payload);
+    if (backendUser) {
+      localStorage.setItem("geoalert-session", "active");
+      localStorage.setItem("geoalert-user", backendUser.name || payload.name);
+      localStorage.setItem("geoalert-role", backendUser.role || payload.role || "Citizen");
+      localStorage.setItem("geoalert-email", backendUser.email || payload.email);
+      if (payload.state) localStorage.setItem("geoalert-state", payload.state);
+      if (payload.district) localStorage.setItem("geoalert-district", payload.district);
+      setUser(backendUser);
+    }
+    return backendUser;
+  };
+
+  const updateProfile = async (updates: { name?: string; state?: string; district?: string }) => {
+    if (!user?.email) return null;
+    const updatedUser = await api.updateProfile({ email: user.email, ...updates });
+    if (updatedUser) {
+      if (updatedUser.name) localStorage.setItem("geoalert-user", updatedUser.name);
+      if (updatedUser.state) localStorage.setItem("geoalert-state", updatedUser.state);
+      if (updatedUser.district) localStorage.setItem("geoalert-district", updatedUser.district);
+      setUser((curr) => (curr ? { ...curr, ...updatedUser } : curr));
+    }
+    return updatedUser;
+  };
+
+  const deleteAccount = async () => {
+    if (!user?.email) return false;
+    const success = await api.deleteAccount(user.email);
+    if (success) {
+      logout();
+    }
+    return success;
   };
 
   const logout = () => {
@@ -70,6 +114,9 @@ export function useAuth() {
     isAuthenticated: !!user,
     loading: false,
     loginWithBackend,
+    registerWithBackend,
+    updateProfile,
+    deleteAccount,
     logout,
   };
 }

@@ -20,7 +20,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/useMobile";
-import { BellRing, History, Home as HomeIcon, LayoutDashboard, LogOut, Map as MapIcon, PanelLeft, ShieldAlert, ShieldCheck } from "lucide-react";
+import { BellRing, History, Home as HomeIcon, LayoutDashboard, LogOut, Map as MapIcon, PanelLeft, Settings, ShieldAlert, ShieldCheck } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -31,6 +31,7 @@ const baseMenuItems = [
   { icon: MapIcon, label: "Full Map View", path: "/map" },
   { icon: History, label: "History & Analytics", path: "/history" },
   { icon: BellRing, label: "Emergency Broadcasts", path: "/broadcasts", isYellow: true },
+  { icon: Settings, label: "Settings", path: "/settings" },
   { icon: HomeIcon, label: "Home Page", path: "/" },
 ];
 

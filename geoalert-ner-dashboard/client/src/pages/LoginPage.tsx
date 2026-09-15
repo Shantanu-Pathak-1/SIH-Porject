@@ -121,14 +121,24 @@ export default function LoginPage() {
   // Helper to validate Operator clearance passcode
   const validateOperatorCode = (): boolean => {
     if (role === "Admin / Operator") {
-      const trimmed = operatorCode.trim().toUpperCase();
-      const validCodes = ["GEO-2026", "ADMIN-2026", "SIH2026", "OPERATOR", "ADMIN"];
+      const trimmed = operatorCode.trim().toLowerCase();
+      const validCodes = [
+        "geo-2026",
+        "geo2026",
+        "admin-2026",
+        "admin2026",
+        "sih2026",
+        "sih-2026",
+        "operator",
+        "admin",
+        "2026",
+      ];
       if (!trimmed) {
-        setError("Operator clearance code is required for authority access.");
+        setError("Operator clearance code is required for authority access. (Demo Code: GEO-2026)");
         return false;
       }
       if (!validCodes.includes(trimmed)) {
-        setError("Access Denied: Invalid Operator clearance code.");
+        setError("Access Denied: Invalid Operator clearance code. Please use GEO-2026.");
         return false;
       }
     }
@@ -136,7 +146,7 @@ export default function LoginPage() {
   };
 
   // Handle Form Submission (Login or Signup Step 1)
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
     setSuccessMessage("");
@@ -153,13 +163,19 @@ export default function LoginPage() {
         return;
       }
 
-      // Save login session & call backend API
-      auth.loginWithBackend(email.trim(), role, email.split("@")[0]);
-
-      setSuccessMessage("Signed in successfully! Redirecting...");
-      setTimeout(() => {
-        window.location.href = "/dashboard";
-      }, 300);
+      try {
+        const user = await auth.loginWithBackend(email.trim(), password.trim(), role);
+        if (user) {
+          setSuccessMessage("Signed in successfully! Redirecting...");
+          setTimeout(() => {
+            window.location.href = "/dashboard";
+          }, 300);
+        } else {
+          setError("Account not found. Please check your email or create a new account.");
+        }
+      } catch (err: any) {
+        setError(err?.message || "Login failed. Account not found or incorrect credentials.");
+      }
       return;
     }
 
@@ -184,6 +200,17 @@ export default function LoginPage() {
     // Check operator code if Admin / Operator is chosen
     if (!validateOperatorCode()) {
       return;
+    }
+
+    // Check if account already exists with this email address
+    try {
+      const existingUser = await api.getMe(email.trim());
+      if (existingUser) {
+        setError("An account already exists with this email address. Please sign in instead.");
+        return;
+      }
+    } catch (err) {
+      // Ignore 404
     }
 
     // Generate simulated 6-digit OTP
@@ -242,7 +269,7 @@ export default function LoginPage() {
   };
 
   // Verify OTP and complete registration
-  const handleVerifyOtp = (e: FormEvent) => {
+  const handleVerifyOtp = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
 
@@ -257,27 +284,25 @@ export default function LoginPage() {
       return;
     }
 
-    // Register user details & password in backend API
-    api.register({
-      name: name.trim(),
-      email: email.trim(),
-      password,
-      role,
-      state: selectedState,
-      district: selectedDistrict,
-    }).then(() => {
-      localStorage.setItem("geoalert-session", "active");
-      localStorage.setItem("geoalert-user", name.trim());
-      localStorage.setItem("geoalert-email", email.trim());
-      localStorage.setItem("geoalert-role", role);
-      localStorage.setItem("geoalert-state", selectedState);
-      localStorage.setItem("geoalert-district", selectedDistrict);
+    try {
+      const registeredUser = await auth.registerWithBackend({
+        name: name.trim(),
+        email: email.trim(),
+        password,
+        role,
+        state: selectedState,
+        district: selectedDistrict,
+      });
 
-      setSuccessMessage("Gmail verified & Account Registered! Redirecting...");
-      setTimeout(() => {
-        window.location.href = "/dashboard";
-      }, 450);
-    });
+      if (registeredUser) {
+        setSuccessMessage("Gmail verified & Account Registered! Redirecting...");
+        setTimeout(() => {
+          window.location.href = "/dashboard";
+        }, 450);
+      }
+    } catch (err: any) {
+      setError(err?.message || "Registration failed. Account already exists or server error.");
+    }
   };
 
   const nextQuote = () => {
@@ -530,11 +555,15 @@ export default function LoginPage() {
                         type="password"
                         value={operatorCode}
                         onChange={(e) => setOperatorCode(e.target.value)}
-                        placeholder="Enter Authority Clearance Passcode"
+                        placeholder="e.g. GEO-2026"
                         className="w-full h-8.5 px-3 pl-8 rounded-lg bg-[#062421]/90 border border-amber-500/40 text-amber-200 placeholder-amber-200/35 text-xs focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/50 transition-all font-mono tracking-wide"
                       />
                       <KeyRound size={13} className="absolute left-2.5 top-2.5 text-amber-400" />
                     </div>
+                    <p className="text-[10px] text-amber-300/80 mt-1 flex items-center gap-1">
+                      <span>Clearance Code for Demo / Judges:</span>
+                      <code className="bg-amber-500/25 px-1 py-0.2 rounded text-amber-200 font-mono font-bold border border-amber-500/40">GEO-2026</code>
+                    </p>
                   </div>
                 )}
 

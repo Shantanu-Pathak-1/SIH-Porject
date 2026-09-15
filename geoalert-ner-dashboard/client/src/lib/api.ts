@@ -19,8 +19,8 @@ export async function fetchApi<T>(endpoint: string, options?: RequestInit): Prom
 
     return await res.json();
   } catch (err: any) {
-    console.warn(`[GeoAlert API Client] Endpoint ${endpoint} fallback:`, err?.message || err);
-    return null;
+    console.warn(`[GeoAlert API Client] Endpoint ${endpoint} error:`, err?.message || err);
+    throw err;
   }
 }
 
@@ -52,6 +52,27 @@ export const api = {
   getMe: async (email?: string): Promise<User | null> => {
     const data = await fetchApi<{ user: User }>(`/auth/me${email ? `?email=${encodeURIComponent(email)}` : ""}`);
     return data?.user || null;
+  },
+
+  updateProfile: async (payload: {
+    email: string;
+    name?: string;
+    state?: string;
+    district?: string;
+  }): Promise<User | null> => {
+    const data = await fetchApi<{ user: User }>("/auth/profile", {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    });
+    return data?.user || null;
+  },
+
+  deleteAccount: async (email: string): Promise<boolean> => {
+    const data = await fetchApi<{ success: boolean }>("/auth/profile", {
+      method: "DELETE",
+      body: JSON.stringify({ email }),
+    });
+    return data?.success || false;
   },
 
   // GPS Location Evaluation

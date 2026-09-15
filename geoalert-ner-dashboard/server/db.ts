@@ -71,13 +71,7 @@ class DatabaseStore {
   }): Promise<User> {
     let existing = await this.findUserByEmail(userData.email);
     if (existing) {
-      existing.name = userData.name || existing.name;
-      if (userData.password) existing.password = userData.password;
-      if (userData.role) existing.role = userData.role as any;
-      if (userData.state) existing.state = userData.state;
-      if (userData.district) existing.district = userData.district;
-      const { password, ...safeUser } = existing;
-      return safeUser as User;
+      throw new Error("Account already exists with this email address. Please sign in instead.");
     }
 
     const newUser: User = {
@@ -88,6 +82,7 @@ class DatabaseStore {
       role: (userData.role as any) || "Citizen",
       state: userData.state || "Assam",
       district: userData.district || "Karbi Anglong (Diphu)",
+      status: "active",
     };
 
     this.users.push(newUser);
@@ -95,15 +90,25 @@ class DatabaseStore {
     return safeUser as User;
   }
 
-  async authenticateUser(email: string, role?: string, name?: string, password?: string): Promise<User> {
+  async authenticateUser(params: {
+    email: string;
+    password?: string;
+    role?: string;
+    name?: string;
+  }): Promise<User> {
+    const { email, password, role, name } = params;
     let existing = await this.findUserByEmail(email);
     if (!existing) {
-      return this.registerUser({ name: name || email.split("@")[0], email, password, role });
+      throw new Error("Account not found. Please check your email or create a new account.");
+    }
+
+    if (existing.status === "blocked") {
+      throw new Error("Account suspended: Access denied by system administrator.");
     }
 
     // Password validation check if password supplied
     if (password && existing.password && existing.password !== password) {
-      throw new Error("Invalid email or password");
+      throw new Error("Incorrect password. Please try again.");
     }
 
     if (role) existing.role = role as any;
@@ -121,6 +126,31 @@ class DatabaseStore {
       return safeUser as User;
     }
     return undefined;
+  }
+
+  async updateUserProfile(email: string, updates: {
+    name?: string;
+    state?: string;
+    district?: string;
+  }): Promise<User | undefined> {
+    const user = this.users.find((u) => u.email.toLowerCase() === email.toLowerCase());
+    if (user) {
+      if (updates.name) user.name = updates.name;
+      if (updates.state) user.state = updates.state;
+      if (updates.district) user.district = updates.district;
+      const { password, ...safeUser } = user;
+      return safeUser as User;
+    }
+    return undefined;
+  }
+
+  async deleteUserByEmail(email: string): Promise<boolean> {
+    const index = this.users.findIndex((u) => u.email.toLowerCase() === email.toLowerCase());
+    if (index !== -1) {
+      this.users.splice(index, 1);
+      return true;
+    }
+    return false;
   }
 
   // User Live GPS Location Hazard Evaluation (2-Tier Alert Classification Engine)

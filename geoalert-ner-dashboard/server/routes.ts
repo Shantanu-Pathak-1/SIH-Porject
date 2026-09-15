@@ -30,7 +30,7 @@ apiRouter.post("/auth/login", async (req, res) => {
       return res.status(400).json({ error: "Email is required" });
     }
 
-    const user = await dbStore.authenticateUser(email, role, name, password);
+    const user = await dbStore.authenticateUser({ email, password, role, name });
     res.json({ success: true, user });
   } catch (error: any) {
     res.status(401).json({ error: error.message || "Authentication failed" });
@@ -46,11 +46,47 @@ apiRouter.get("/auth/me", async (req, res) => {
       if (user) {
         const { password, ...safeUser } = user as any;
         return res.json({ user: safeUser });
+      } else {
+        return res.status(404).json({ error: "User not found", user: null });
       }
     }
 
     const users = await dbStore.getUsers();
-    res.json({ user: users[0] });
+    res.json({ user: users[0] || null });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+apiRouter.patch("/auth/profile", async (req, res) => {
+  try {
+    const { email, name, state, district } = req.body || {};
+    if (!email) {
+      return res.status(400).json({ error: "Email is required to update profile." });
+    }
+
+    const updatedUser = await dbStore.updateUserProfile(email, { name, state, district });
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User account not found." });
+    }
+    res.json({ success: true, user: updatedUser });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+apiRouter.delete("/auth/profile", async (req, res) => {
+  try {
+    const { email } = req.body || {};
+    if (!email) {
+      return res.status(400).json({ error: "Email is required to delete account." });
+    }
+
+    const success = await dbStore.deleteUserByEmail(email);
+    if (!success) {
+      return res.status(404).json({ error: "User account not found." });
+    }
+    res.json({ success: true, message: "Account successfully deleted." });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }

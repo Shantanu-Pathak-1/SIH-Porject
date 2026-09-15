@@ -11,6 +11,7 @@ import MapViewPage from "./pages/MapViewPage";
 import HistoryPage from "./pages/HistoryPage";
 import BroadcastsPage from "./pages/BroadcastsPage";
 import AdminControlPage from "./pages/AdminControlPage";
+import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
 
 function Router() {
@@ -20,6 +21,7 @@ function Router() {
       <Route path="/login" component={LoginPage} />
       <Route path="/dashboard" component={DashboardPage} />
       <Route path="/admin" component={AdminControlPage} />
+      <Route path="/settings" component={SettingsPage} />
       <Route path="/map" component={MapViewPage} />
       <Route path="/history" component={HistoryPage} />
       <Route path="/broadcasts" component={BroadcastsPage} />
