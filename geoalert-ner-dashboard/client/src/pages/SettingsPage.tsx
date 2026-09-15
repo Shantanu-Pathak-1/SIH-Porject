@@ -3,33 +3,46 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/hooks/useAuth";
+import { triggerTieredAlert } from "@/lib/audioAlert";
 import { nerLocations, nerStateList } from "@/lib/nerLocationData";
 import {
   AlertTriangle,
   Bell,
   CheckCircle2,
+  Edit3,
   Globe,
   Info,
+  KeyRound,
   Lock,
   LogOut,
   MapPin,
+  Megaphone,
   Moon,
+  Navigation,
   Save,
   Settings as SettingsIcon,
-  Shield,
+  ShieldCheck,
   Trash2,
   User,
-  Volume2
+  Volume2,
+  VolumeX,
+  XCircle
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export default function SettingsPage() {
   const { user, updateProfile, deleteAccount } = useAuth();
+  const isAdmin = user?.role === "Admin / Operator";
+
+  // Name Edit State
+  const [name, setName] = useState(user?.name || "");
+  const [isSavingName, setIsSavingName] = useState(false);
 
   // Basic Settings States
   const [audioEnabled, setAudioEnabled] = useState(true);
@@ -43,15 +56,66 @@ export default function SettingsPage() {
   );
   const [isSavingLocation, setIsSavingLocation] = useState(false);
 
+  // Browser Permission Live States
+  const [gpsPermission, setGpsPermission] = useState<"granted" | "denied" | "prompt">("prompt");
+  const [pushPermission, setPushPermission] = useState<NotificationPermission>("default");
+  const [audioUnlocked, setAudioUnlocked] = useState(false);
+
   // Delete Account Modal State
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Sync state & district if user data updates
+  // Sync initial values
   useEffect(() => {
+    if (user?.name) setName(user.name);
     if (user?.state) setSelectedState(user.state);
     if (user?.district) setSelectedDistrict(user.district);
   }, [user]);
+
+  // Check initial browser permissions
+  useEffect(() => {
+    // Check Notification Permission
+    if (typeof window !== "undefined" && "Notification" in window) {
+      setPushPermission(Notification.permission);
+    }
+
+    // Check Geolocation Permission status API if supported
+    if (typeof window !== "undefined" && "navigator" in window && "permissions" in navigator) {
+      navigator.permissions
+        .query({ name: "geolocation" as any })
+        .then((result) => {
+          setGpsPermission(result.state as any);
+          result.onchange = () => {
+            setGpsPermission(result.state as any);
+          };
+        })
+        .catch(() => {});
+    }
+  }, []);
+
+  // Handle Name Change Save
+  const handleSaveName = async () => {
+    if (!name.trim()) {
+      toast.error("Please enter a valid full name.");
+      return;
+    }
+
+    setIsSavingName(true);
+    try {
+      const updated = await updateProfile({ name: name.trim() });
+      if (updated) {
+        toast.success("✅ Profile Name Updated Successfully!", {
+          description: `Account name updated to ${name.trim()}.`,
+        });
+      } else {
+        toast.error("Failed to update name.");
+      }
+    } catch (err: any) {
+      toast.error(err?.message || "Error updating name.");
+    } finally {
+      setIsSavingName(false);
+    }
+  };
 
   // Handle State Change -> Update Available District Options
   const handleStateChange = (stateName: string) => {
@@ -81,6 +145,65 @@ export default function SettingsPage() {
     } finally {
       setIsSavingLocation(false);
     }
+  };
+
+  // Browser Permission Triggers
+  const handleRequestGpsPermission = () => {
+    if (!("geolocation" in navigator)) {
+      toast.error("Geolocation is not supported by your browser.");
+      return;
+    }
+
+    toast.info("📍 Requesting GPS Location Access...", {
+      description: "Please click 'Allow' in your browser popup window.",
+    });
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setGpsPermission("granted");
+        toast.success(`✅ GPS Permission Granted!`, {
+          description: `Lat: ${pos.coords.latitude.toFixed(2)}, Lon: ${pos.coords.longitude.toFixed(2)}`,
+        });
+      },
+      (err) => {
+        setGpsPermission("denied");
+        toast.error(`❌ GPS Permission Denied (${err.message})`, {
+          description: "Location permission is required for auto hazard proximity evaluation.",
+        });
+      },
+      { timeout: 10000 }
+    );
+  };
+
+  const handleRequestPushPermission = () => {
+    if (!("Notification" in window)) {
+      toast.error("Push Notifications are not supported by your browser.");
+      return;
+    }
+
+    Notification.requestPermission().then((permission) => {
+      setPushPermission(permission);
+      if (permission === "granted") {
+        toast.success("🔔 Browser Push Notification Permission Granted!", {
+          description: "You will now receive emergency hazard popups from Vercel web deployment.",
+        });
+        // Send sample browser notification
+        new Notification("GeoAlert Push Verification", {
+          body: "Push notification permissions are fully active and working!",
+          icon: "/favicon.ico",
+        });
+      } else {
+        toast.error("❌ Notification permission was blocked or denied.");
+      }
+    });
+  };
+
+  const handleTestAudioEngine = () => {
+    triggerTieredAlert("NEARBY_CAUTION", "🔊 Web Audio Engine Initialized", "AudioContext active & ready.");
+    setAudioUnlocked(true);
+    toast.success("🔊 Web Audio Siren Engine Initialized!", {
+      description: "Web AudioContext unlocked for emergency siren playback.",
+    });
   };
 
   // Delete Account Confirmation
@@ -114,7 +237,7 @@ export default function SettingsPage() {
               </h1>
             </div>
             <p className="text-sm text-slate-400">
-              Manage your preferences, fallback location, alert notifications, and account settings.
+              Manage your name, fallback location, browser permissions (Vercel/Chrome), alert demos, and account settings.
             </p>
           </div>
 
@@ -123,22 +246,116 @@ export default function SettingsPage() {
           </Badge>
         </div>
 
-        {/* Profile Card */}
+        {/* ADMIN EXCLUSIVE: Alert Demo Panel */}
+        {isAdmin && (
+          <Card className="bg-gradient-to-r from-amber-950/60 via-slate-900 to-amber-950/60 border-amber-500/40 shadow-xl">
+            <CardHeader className="pb-3 border-b border-amber-500/30">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg font-bold text-amber-300 flex items-center gap-2">
+                  <ShieldCheck className="h-5 w-5 text-amber-400" />
+                  🔊 Admin Emergency Audio & Alert Demo Panel
+                </CardTitle>
+                <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/40 text-[10px]">
+                  ADMIN / OPERATOR ONLY
+                </Badge>
+              </div>
+              <CardDescription className="text-xs text-amber-200/70">
+                Test Tier-1 Emergency Evacuation Siren and Tier-2 Caution Chime sounds with instant browser push alert.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-4 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Tier 1 Siren Demo */}
+                <div className="p-4 bg-red-950/40 border border-red-500/40 rounded-xl space-y-3">
+                  <div className="space-y-1">
+                    <div className="text-sm font-bold text-red-300 flex items-center gap-2">
+                      <Megaphone className="h-4 w-4 text-red-400 animate-pulse" />
+                      Tier-1 Emergency Siren Demo
+                    </div>
+                    <p className="text-xs text-red-200/70">
+                      Plays loud 2-tone emergency evacuation alarm siren sound & triggers browser push alert.
+                    </p>
+                  </div>
+                  <Button
+                    onClick={() =>
+                      triggerTieredAlert(
+                        "EMERGENCY_EVACUATION",
+                        "🚨 DEMO EMERGENCY EVACUATION",
+                        "High hazard risk detected near your location. Immediate evacuation advised."
+                      )
+                    }
+                    className="w-full bg-red-600 hover:bg-red-700 text-white font-bold gap-2 text-xs shadow-lg shadow-red-600/20"
+                  >
+                    <Volume2 className="h-4 w-4" />
+                    🚨 Test Tier-1 Emergency Siren
+                  </Button>
+                </div>
+
+                {/* Tier 2 Chime Demo */}
+                <div className="p-4 bg-amber-950/40 border border-amber-500/40 rounded-xl space-y-3">
+                  <div className="space-y-1">
+                    <div className="text-sm font-bold text-amber-300 flex items-center gap-2">
+                      <Bell className="h-4 w-4 text-amber-400" />
+                      Tier-2 Caution Chime Demo
+                    </div>
+                    <p className="text-xs text-amber-200/70">
+                      Plays soft 2-note neighboring area caution advisory chime sound & push notification.
+                    </p>
+                  </div>
+                  <Button
+                    onClick={() =>
+                      triggerTieredAlert(
+                        "NEARBY_CAUTION",
+                        "⚠️ DEMO NEARBY AREA CAUTION",
+                        "Heavy rainfall observed in neighboring district. Stay alert for slope corridors."
+                      )
+                    }
+                    className="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold gap-2 text-xs shadow-lg shadow-amber-500/20"
+                  >
+                    <Volume2 className="h-4 w-4 text-slate-950" />
+                    ⚠️ Test Tier-2 Caution Chime
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Profile Card & Name Edit */}
         <Card className="bg-slate-900/90 border-slate-800 shadow-xl">
           <CardHeader className="pb-3 border-b border-slate-800">
             <CardTitle className="text-lg font-bold text-slate-100 flex items-center gap-2">
               <User className="h-5 w-5 text-emerald-400" />
-              User Profile Overview
+              User Profile & Name Edit
             </CardTitle>
             <CardDescription className="text-xs text-slate-400">
-              Your registered user details and authority clearance role.
+              View your registered email, authority clearance role, and update your account display name.
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-4 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1 p-3 bg-slate-950 rounded-xl border border-slate-800">
-                <div className="text-xs text-slate-400 uppercase font-semibold">Full Name</div>
-                <div className="text-sm font-bold text-slate-100">{user?.name || "User"}</div>
+              {/* Full Name Edit Input */}
+              <div className="space-y-1.5 sm:col-span-2 p-4 bg-slate-950 rounded-xl border border-slate-800">
+                <Label className="text-xs text-slate-300 uppercase font-semibold flex items-center gap-1.5">
+                  <Edit3 className="h-3.5 w-3.5 text-emerald-400" />
+                  Full Display Name (edit permission enabled)
+                </Label>
+                <div className="flex flex-col sm:flex-row gap-2 mt-1">
+                  <Input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Enter your full name"
+                    className="bg-slate-900 border-slate-700 text-slate-100 focus:border-emerald-500 flex-1"
+                  />
+                  <Button
+                    onClick={handleSaveName}
+                    disabled={isSavingName || !name.trim() || name === user?.name}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold gap-1.5 shrink-0"
+                  >
+                    <Save className="h-4 w-4" />
+                    {isSavingName ? "Saving..." : "Save Name"}
+                  </Button>
+                </div>
               </div>
 
               <div className="space-y-1 p-3 bg-slate-950 rounded-xl border border-slate-800">
@@ -161,88 +378,133 @@ export default function SettingsPage() {
                   </Badge>
                 </div>
               </div>
-
-              <div className="space-y-1 p-3 bg-slate-950 rounded-xl border border-slate-800">
-                <div className="text-xs text-slate-400 uppercase font-semibold">Active Saved Location</div>
-                <div className="text-sm font-bold text-emerald-400 flex items-center gap-1.5">
-                  <MapPin className="h-4 w-4 text-amber-400" />
-                  {user?.district || "Karbi Anglong"}, {user?.state || "Assam"}
-                </div>
-              </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Basic System Settings */}
+        {/* BROWSER PERMISSIONS MANAGER (Vercel & Chrome Deployment) */}
         <Card className="bg-slate-900/90 border-slate-800 shadow-xl">
           <CardHeader className="pb-3 border-b border-slate-800">
             <CardTitle className="text-lg font-bold text-slate-100 flex items-center gap-2">
-              <Bell className="h-5 w-5 text-emerald-400" />
-              Basic System Preferences
+              <Lock className="h-5 w-5 text-cyan-400" />
+              🔒 Browser Permissions Manager (Vercel & Chrome Deployment)
             </CardTitle>
             <CardDescription className="text-xs text-slate-400">
-              Configure alert audio sirens, browser notifications, and high-contrast view options.
+              Manage browser security permissions required for live GPS proximity tracking, Web Audio siren playback, and push alerts.
             </CardDescription>
           </CardHeader>
+
           <CardContent className="pt-4 divide-y divide-slate-800">
-            {/* Audio Alerts */}
-            <div className="py-3 flex items-center justify-between gap-4">
+            {/* GPS Location Permission */}
+            <div className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="space-y-0.5">
                 <div className="text-sm font-semibold text-slate-200 flex items-center gap-2">
-                  <Volume2 className="h-4 w-4 text-amber-400" />
-                  Emergency Audio Siren & Chime Sound
+                  <Navigation className="h-4 w-4 text-cyan-400" />
+                  GPS Location Satellite Fix Permission
                 </div>
                 <div className="text-xs text-slate-400">
-                  Play automatic 2-tone audio alarm when critical landslide danger is evaluated.
+                  Required for real-time Haversine distance evaluation from active landslide zones.
                 </div>
               </div>
-              <Switch checked={audioEnabled} onCheckedChange={setAudioEnabled} />
+
+              <div className="flex items-center gap-2 self-start sm:self-auto">
+                <Badge
+                  className={
+                    gpsPermission === "granted"
+                      ? "bg-emerald-950 text-emerald-300 border-emerald-500/40"
+                      : gpsPermission === "denied"
+                      ? "bg-red-950 text-red-300 border-red-500/40"
+                      : "bg-slate-800 text-slate-300 border-slate-700"
+                  }
+                >
+                  {gpsPermission === "granted" ? "✅ GRANTED" : gpsPermission === "denied" ? "❌ DENIED" : "📌 NOT PROMPTED"}
+                </Badge>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleRequestGpsPermission}
+                  className="h-8 text-xs bg-cyan-500/10 text-cyan-300 border-cyan-500/30 hover:bg-cyan-500/20"
+                >
+                  Request GPS Access
+                </Button>
+              </div>
             </div>
 
-            {/* Push Notifications */}
-            <div className="py-3 flex items-center justify-between gap-4">
+            {/* Push Notification Permission */}
+            <div className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="space-y-0.5">
                 <div className="text-sm font-semibold text-slate-200 flex items-center gap-2">
                   <Bell className="h-4 w-4 text-emerald-400" />
-                  Real-Time Browser Push Alerts
+                  Browser Emergency Push Notification Permission
                 </div>
                 <div className="text-xs text-slate-400">
-                  Receive browser notifications for extreme rainfall & slope movement warnings.
+                  Allows Chrome/Edge to trigger push advisory popups even when tab is minimized.
                 </div>
               </div>
-              <Switch checked={pushEnabled} onCheckedChange={setPushEnabled} />
+
+              <div className="flex items-center gap-2 self-start sm:self-auto">
+                <Badge
+                  className={
+                    pushPermission === "granted"
+                      ? "bg-emerald-950 text-emerald-300 border-emerald-500/40"
+                      : pushPermission === "denied"
+                      ? "bg-red-950 text-red-300 border-red-500/40"
+                      : "bg-slate-800 text-slate-300 border-slate-700"
+                  }
+                >
+                  {pushPermission === "granted" ? "✅ GRANTED" : pushPermission === "denied" ? "❌ DENIED" : "📌 DEFAULT"}
+                </Badge>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleRequestPushPermission}
+                  className="h-8 text-xs bg-emerald-500/10 text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/20"
+                >
+                  Enable Push Alerts
+                </Button>
+              </div>
             </div>
 
-            {/* GPS Auto-Tracking */}
-            <div className="py-3 flex items-center justify-between gap-4">
+            {/* Web Audio Siren Permission */}
+            <div className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="space-y-0.5">
                 <div className="text-sm font-semibold text-slate-200 flex items-center gap-2">
-                  <Globe className="h-4 w-4 text-cyan-400" />
-                  Automatic Live Location Fallback
+                  <Volume2 className="h-4 w-4 text-amber-400" />
+                  Web Audio Siren Engine Initialization
                 </div>
                 <div className="text-xs text-slate-400">
-                  Use saved State & District when live GPS satellite fix is unavailable.
+                  Chrome autoplay security policy requires 1 user click gesture to unlock WebAudio Context.
                 </div>
               </div>
-              <Switch checked={autoLocationEnabled} onCheckedChange={setAutoLocationEnabled} />
-            </div>
 
-            {/* Theme Display */}
-            <div className="py-3 flex items-center justify-between gap-4">
-              <div className="space-y-0.5">
-                <div className="text-sm font-semibold text-slate-200 flex items-center gap-2">
-                  <Moon className="h-4 w-4 text-purple-400" />
-                  High-Contrast Climate-Tech Dark Mode
-                </div>
-                <div className="text-xs text-slate-400">
-                  Optimized dark forest palette for outdoor readability and field deployment.
-                </div>
+              <div className="flex items-center gap-2 self-start sm:self-auto">
+                <Badge
+                  className={
+                    audioUnlocked
+                      ? "bg-emerald-950 text-emerald-300 border-emerald-500/40"
+                      : "bg-amber-950 text-amber-300 border-amber-500/40"
+                  }
+                >
+                  {audioUnlocked ? "✅ UNLOCKED" : "⚠️ REQUIRES GESTURE"}
+                </Badge>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleTestAudioEngine}
+                  className="h-8 text-xs bg-amber-500/10 text-amber-300 border-amber-500/30 hover:bg-amber-500/20"
+                >
+                  Unlock Audio Engine
+                </Button>
               </div>
-              <Badge className="bg-purple-950 text-purple-300 border-purple-500/40 text-xs">
-                ENABLED BY DEFAULT
-              </Badge>
             </div>
           </CardContent>
+
+          <CardFooter className="pt-3 border-t border-slate-800 bg-slate-950/50 text-[11px] text-slate-400 flex items-center gap-2">
+            <Info className="h-3.5 w-3.5 text-cyan-400 shrink-0" />
+            <span>
+              Note for Vercel deployment: HTTPS protocol automatically handles browser permission security popups across Chrome, Edge, Safari, and Mobile browsers.
+            </span>
+          </CardFooter>
         </Card>
 
         {/* Change Fallback Location */}

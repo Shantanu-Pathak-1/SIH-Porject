@@ -26,13 +26,21 @@ import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
 
-const baseMenuItems = [
+type MenuItem = {
+  icon: any;
+  label: string;
+  path: string;
+  isYellow?: boolean;
+  isAdmin?: boolean;
+};
+
+const baseMenuItems: MenuItem[] = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
   { icon: MapIcon, label: "Full Map View", path: "/map" },
   { icon: History, label: "History & Analytics", path: "/history" },
   { icon: BellRing, label: "Emergency Broadcasts", path: "/broadcasts", isYellow: true },
-  { icon: Settings, label: "Settings", path: "/settings" },
   { icon: HomeIcon, label: "Home Page", path: "/" },
+  { icon: Settings, label: "Settings", path: "/settings" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
@@ -117,7 +125,7 @@ function DashboardLayoutContent({
 
   const isAdmin = user?.role === "Admin / Operator";
 
-  const menuItems = [
+  const menuItems: MenuItem[] = [
     baseMenuItems[0], // Dashboard
     ...(isAdmin ? [{ icon: ShieldCheck, label: "Admin Control", path: "/admin", isAdmin: true }] : []),
     ...baseMenuItems.slice(1),
