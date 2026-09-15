@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowUpRight, BarChart3, Calendar, Download, FileText, Filter, History, RefreshCw, ShieldAlert, Waves } from "lucide-react";
 import DashboardLayout from "@/components/DashboardLayout";
 import TrendCharts from "@/components/TrendCharts";
@@ -7,6 +7,8 @@ import { defaultDistricts, type District, type DistrictId } from "@/lib/district
 import { useTheme } from "@/contexts/ThemeContext";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { api } from "@/lib/api";
+import type { TelemetryRecord } from "../../../shared/types";
 
 const timeFilterOptions = [
   { id: "today", label: "Today (Live)" },
@@ -25,10 +27,23 @@ const mockIncidents = [
 
 export default function HistoryPage() {
   const { theme } = useTheme();
-  const [districts] = useState<District[]>(defaultDistricts);
+  const [districts, setDistricts] = useState<District[]>(defaultDistricts);
   const [selectedId, setSelectedId] = useState<DistrictId>("tawang");
   const [timeFilter, setTimeFilter] = useState("7days");
+  const [telemetryLogs, setTelemetryLogs] = useState<TelemetryRecord[]>([]);
   const [lastUpdated] = useState(() => new Date());
+
+  useEffect(() => {
+    api.getDistricts().then((data) => {
+      if (data && data.length > 0) setDistricts(data as any);
+    });
+  }, []);
+
+  useEffect(() => {
+    api.getTelemetryHistory(timeFilter).then((logs) => {
+      if (logs) setTelemetryLogs(logs);
+    });
+  }, [timeFilter]);
 
   const selected = districts.find((d) => d.id === selectedId) || districts[0];
 

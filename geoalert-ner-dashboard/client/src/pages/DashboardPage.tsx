@@ -11,6 +11,7 @@ import { clampTelemetry } from "@/lib/geoalert";
 import { useTheme } from "@/contexts/ThemeContext";
 import { toast } from "sonner";
 import { defaultDistricts, type District, type DistrictId, type RiskLevel } from "@/lib/districtsData";
+import { api } from "@/lib/api";
 
 const channels = ["SMS", "WhatsApp", "Local Siren"];
 
@@ -66,22 +67,25 @@ export default function DashboardPage() {
 
   const districtsById = useMemo(() => Object.fromEntries(districts.map((d) => [d.id, d])) as Record<DistrictId, District>, [districts]);
   const networkSensors = useMemo(() => districts.reduce((sum, d) => {
-    const [online, total] = d.sensorCount.split("/").map((v) => Number.parseInt(v.trim(), 10));
-    return { online: sum.online + online, total: sum.total + total };
+    const [online, total] = (d.sensorCount || "18/20").split("/").map((v) => Number.parseInt(v.trim(), 10));
+    return { online: sum.online + (isNaN(online) ? 18 : online), total: sum.total + (isNaN(total) ? 20 : total) };
   }, { online: 0, total: 0 }), [districts]);
 
   const selected = districtsById[selectedId] || districts[0];
   const broadcastTarget = districtsById[broadcastDistrict] || districts[0];
 
+  // Fetch real live districts & Open-Meteo telemetry from Express Backend API
   useEffect(() => {
-    const interval = window.setInterval(() => {
-      setDistricts((current) => current.map((d) => ({
-        ...d,
-        rainfall: Math.round(clampTelemetry(d.rainfall + (Math.random() - 0.42) * 9, 30, 150)),
-        saturation: Math.round(clampTelemetry(d.saturation + (Math.random() - 0.48) * 4, 22, 95)),
-      })));
-      setLastUpdated(new Date());
-    }, 3000);
+    const fetchLiveDistricts = async () => {
+      const realDistricts = await api.getDistricts();
+      if (realDistricts && realDistricts.length > 0) {
+        setDistricts(realDistricts as any);
+        setLastUpdated(new Date());
+      }
+    };
+
+    fetchLiveDistricts();
+    const interval = window.setInterval(fetchLiveDistricts, 15000);
     return () => window.clearInterval(interval);
   }, []);
 
@@ -98,12 +102,30 @@ export default function DashboardPage() {
   const dispatchAlert = () => {
     if (dispatchState !== "idle") return;
     setDispatchState("sending");
-    window.setTimeout(() => {
-      setBroadcastHistory((current) => [{ id: `${broadcastTarget.id}-${Date.now()}`, district: broadcastTarget.name, districtId: broadcastTarget.id, channel: broadcastChannel, recipient: `${broadcastTarget.name} authorities`, time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }), status: "Dispatched" }, ...current]);
+
+    api.dispatchBroadcast({
+      district: broadcastTarget.name,
+      state: broadcastTarget.state,
+      channel: broadcastChannel,
+      recipient: `${broadcastTarget.name} authorities`,
+      advisory: broadcastTarget.action,
+    }).then((resLog) => {
+      setBroadcastHistory((current) => [
+        {
+          id: resLog?.id || `${broadcastTarget.id}-${Date.now()}`,
+          district: broadcastTarget.name,
+          districtId: broadcastTarget.id,
+          channel: broadcastChannel,
+          recipient: `${broadcastTarget.name} authorities`,
+          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          status: "Dispatched",
+        },
+        ...current,
+      ]);
       setDispatchState("sent");
       toast.success(`Alert dispatched to ${broadcastTarget.name}`, { description: `${broadcastChannel} channel · authorities notified` });
       window.setTimeout(() => setModalOpen(false), 2200);
-    }, 1100);
+    });
   };
 
   return (

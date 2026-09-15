@@ -85,12 +85,24 @@ const initialBroadcastLogs: BroadcastLog[] = [
 ];
 
 export default function BroadcastsPage() {
-  const [districts] = useState<District[]>(defaultDistricts);
+  const [districts, setDistricts] = useState<District[]>(defaultDistricts);
   const [broadcastLogs, setBroadcastLogs] = useState<BroadcastLog[]>(initialBroadcastLogs);
   const [modalOpen, setModalOpen] = useState(false);
   const [targetDistrictId, setTargetDistrictId] = useState<DistrictId>("tawang");
   const [selectedChannel, setSelectedChannel] = useState(channels[0]);
   const [dispatchState, setDispatchState] = useState<"idle" | "sending" | "sent">("idle");
+
+  useEffect(() => {
+    api.getDistricts().then((data) => {
+      if (data && data.length > 0) setDistricts(data as any);
+    });
+
+    api.getBroadcastLogs().then((logs) => {
+      if (logs && logs.length > 0) {
+        setBroadcastLogs(logs as any);
+      }
+    });
+  }, []);
 
   const targetDistrict = districts.find((d) => d.id === targetDistrictId) || districts[0];
 
