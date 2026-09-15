@@ -322,9 +322,9 @@ export default function AdminControlPage() {
                 </Select>
               </div>
 
-              {/* Jila / District Select Dropdown */}
+              {/* District Select Dropdown */}
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-slate-300">Jila / District (जिला)</Label>
+                <Label className="text-xs font-semibold text-slate-300">District (जिला)</Label>
                 <Select value={selectedDistrict} onValueChange={(val) => setSelectedDistrict(val)}>
                   <SelectTrigger className="bg-slate-950 border-slate-700 text-slate-100">
                     <SelectValue placeholder="All Districts" />
@@ -440,7 +440,7 @@ export default function AdminControlPage() {
                                   Fallback Location (Saved)
                                 </Badge>
                                 <div className="text-xs font-medium text-slate-200 pl-1">
-                                  State: <span className="text-emerald-400">{u.state || "Assam"}</span> | Jila:{" "}
+                                  State: <span className="text-emerald-400">{u.state || "Assam"}</span> | District:{" "}
                                   <span className="text-amber-400">{u.district || "Karbi Anglong"}</span>
                                 </div>
                               </div>
@@ -572,9 +572,9 @@ export default function AdminControlPage() {
                   </Select>
                 </div>
 
-                {/* Target Jila / District */}
+                {/* Target District */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-slate-300">Target Jila (जिला)</Label>
+                  <Label className="text-xs font-semibold text-slate-300">Target District (जिला)</Label>
                   <Select value={targetDistrict} onValueChange={(val) => setTargetDistrict(val)}>
                     <SelectTrigger className="bg-slate-950 border-slate-700 text-slate-100">
                       <SelectValue placeholder="Select District" />

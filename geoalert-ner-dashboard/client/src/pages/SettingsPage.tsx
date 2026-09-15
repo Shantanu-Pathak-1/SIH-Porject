@@ -538,9 +538,9 @@ export default function SettingsPage() {
                 </Select>
               </div>
 
-              {/* Select Jila / District */}
+              {/* Select District */}
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold text-slate-300">Select Jila / District (जिला)</Label>
+                <Label className="text-xs font-semibold text-slate-300">Select District (जिला)</Label>
                 <Select value={selectedDistrict} onValueChange={(val) => setSelectedDistrict(val)}>
                   <SelectTrigger className="bg-slate-950 border-slate-700 text-slate-100">
                     <SelectValue placeholder="Select District" />

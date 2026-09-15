@@ -616,13 +616,13 @@ export default function LoginPage() {
                         <MapPin size={13} className="absolute left-2.5 top-2.5 text-emerald-400/60 pointer-events-none" />
                       </div>
 
-                      {/* District (Jila) Select */}
+                      {/* District (जिला) Select */}
                       <div className="relative">
                         <select
                           value={selectedDistrict}
                           onChange={(e) => setSelectedDistrict(e.target.value)}
                           className="w-full h-9 px-2.5 pl-7 rounded-xl bg-[#062421]/90 border border-emerald-500/30 text-white text-[11px] focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/50 transition-all appearance-none cursor-pointer truncate"
-                          title="Select District / Jila"
+                          title="Select District (जिला)"
                         >
                           {(nerLocations[selectedState] || []).map((dist) => (
                             <option key={dist} value={dist} className="bg-[#082a27] text-white">
