@@ -314,7 +314,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="h-screen w-full max-h-screen bg-[#082a27] text-white flex flex-col justify-center items-center p-2 sm:p-4 md:p-5 relative overflow-hidden font-sans select-none">
+    <div className="min-h-screen w-full bg-[#082a27] text-white flex flex-col justify-center items-center p-2.5 sm:p-4 md:p-5 relative overflow-y-auto font-sans select-none">
       {/* Background ambient glow matching landing page theme */}
       <div className="absolute -top-40 -left-40 w-96 h-96 bg-emerald-600/15 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-teal-500/15 rounded-full blur-3xl pointer-events-none" />
@@ -335,7 +335,7 @@ export default function LoginPage() {
       </div>
 
       {/* Main Split Authentication Card */}
-      <div className="w-full max-w-5xl bg-[#0b3530]/90 backdrop-blur-2xl border border-emerald-500/25 rounded-2xl sm:rounded-3xl shadow-2xl shadow-black/60 overflow-hidden grid grid-cols-1 md:grid-cols-2 relative z-10 max-h-[calc(100vh-64px)] sm:max-h-[calc(100vh-72px)]">
+      <div className="w-full max-w-5xl bg-[#0b3530]/90 backdrop-blur-2xl border border-emerald-500/25 rounded-2xl sm:rounded-3xl shadow-2xl shadow-black/60 overflow-hidden grid grid-cols-1 md:grid-cols-2 relative z-10 my-auto max-h-none md:max-h-[calc(100vh-72px)]">
         
         {/* Left Column: Form Section */}
         <div className="p-4 sm:p-5 lg:p-6.5 flex flex-col justify-between overflow-y-auto no-scrollbar">

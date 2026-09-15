@@ -164,7 +164,7 @@ export default function MapViewPage() {
         )}
 
         {/* District Quick Select Bar */}
-        <div className="w-full max-w-full flex flex-wrap items-center gap-2 pb-2 pr-4 border-b border-border/20">
+        <div className="w-full max-w-full flex items-center gap-2 pb-2 border-b border-border/20 overflow-x-auto no-scrollbar scrollbar-none">
           <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider shrink-0 mr-1">Select District:</span>
           {districts.map((d) => {
             const isSelected = d.id === selectedId;

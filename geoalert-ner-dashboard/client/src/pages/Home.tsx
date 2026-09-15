@@ -265,20 +265,20 @@ export default function Home() {
               <p className="eyebrow accent-eyebrow !text-amber-400 font-semibold"><span className="eyebrow-line !bg-amber-400" /> AI + GIS EARLY WARNING · NER</p>
               <h1 className="!text-white font-bold">Know the slope<br /><em className="hero-highlight">before</em> it moves.</h1>
               <p className="hero-description !text-white/90">GeoAlert turns rainfall, terrain, satellite context, and live sensor signals into a clear window for action across North-East India.</p>
-              <div className="hero-actions flex flex-wrap items-center gap-3">
+              <div className="hero-actions flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5 sm:gap-3 w-full">
                 <button
-                  className="h-9 px-4.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-[11px] uppercase tracking-wider font-semibold flex items-center gap-2 transition-all shadow-md hover:shadow-emerald-500/25 active:scale-95 cursor-pointer"
+                  className="h-10 sm:h-9 px-4.5 rounded-lg sm:rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs sm:text-[11px] uppercase tracking-wider font-semibold flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-emerald-500/25 active:scale-95 cursor-pointer w-full sm:w-auto"
                   onClick={() => navigate("/login")}
                 >
                   <User size={13} className="text-emerald-200" /> Login / Sign Up <ArrowRight size={14} />
                 </button>
                 <button
-                  className="h-9 px-4 rounded-md border border-white/25 bg-white/10 hover:bg-white/20 hover:border-emerald-400 text-white font-mono text-[11px] uppercase tracking-wider font-semibold flex items-center gap-2 transition-all cursor-pointer"
+                  className="h-10 sm:h-9 px-4 rounded-lg sm:rounded-md border border-white/25 bg-white/10 hover:bg-white/20 hover:border-emerald-400 text-white font-mono text-xs sm:text-[11px] uppercase tracking-wider font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer w-full sm:w-auto"
                   onClick={() => navigate("/dashboard")}
                 >
                   Open Dashboard <ArrowUpRight size={14} />
                 </button>
-                <a className="secondary-cta !h-9 !px-4 !text-[11px] !rounded-md !text-white !border-white/30 hover:!border-amber-400 hover:!text-amber-400 !bg-white/5" href="#workflow">Explore System <ChevronRight size={14} /></a>
+                <a className="secondary-cta !h-10 sm:!h-9 !px-4 !text-xs sm:!text-[11px] !rounded-lg sm:!rounded-md !text-white !border-white/30 hover:!border-amber-400 hover:!text-amber-400 !bg-white/5 flex items-center justify-center w-full sm:w-auto" href="#workflow">Explore System <ChevronRight size={14} /></a>
               </div>
               <div className="hero-meta">
                 <span className="!text-white/85 !border-white/20 !bg-[#06221f]/70"><ShieldAlert size={13} className="text-amber-400" /> Built for response teams</span>

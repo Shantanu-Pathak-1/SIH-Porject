@@ -359,7 +359,72 @@ function DashboardLayoutContent({
             </div>
           </div>
         )}
-        <main className="flex-1 min-w-0 max-w-full overflow-x-hidden p-3 sm:p-5">{children}</main>
+        <main className="flex-1 min-w-0 max-w-full overflow-x-hidden p-3 sm:p-5 pb-20 md:pb-5">{children}</main>
+
+        {/* Mobile Bottom Quick Navigation Bar */}
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#061d19]/95 backdrop-blur-md border-t border-emerald-500/20 px-2 py-1.5 flex items-center justify-around shadow-2xl">
+          <button
+            onClick={() => setLocation("/dashboard")}
+            className={`flex flex-col items-center gap-0.5 py-1 px-2 rounded-xl transition-all ${
+              location === "/dashboard"
+                ? "text-emerald-400 font-bold bg-emerald-500/15"
+                : "text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            <LayoutDashboard className="h-5 w-5" />
+            <span className="text-[10px]">Dashboard</span>
+          </button>
+
+          <button
+            onClick={() => setLocation("/map")}
+            className={`flex flex-col items-center gap-0.5 py-1 px-2 rounded-xl transition-all ${
+              location === "/map"
+                ? "text-emerald-400 font-bold bg-emerald-500/15"
+                : "text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            <MapIcon className="h-5 w-5" />
+            <span className="text-[10px]">Map</span>
+          </button>
+
+          <button
+            onClick={() => setLocation("/broadcasts")}
+            className={`flex flex-col items-center gap-0.5 py-1 px-2 rounded-xl transition-all ${
+              location === "/broadcasts"
+                ? "text-amber-400 font-bold bg-amber-500/15"
+                : "text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            <BellRing className="h-5 w-5 text-amber-400 animate-pulse" />
+            <span className="text-[10px] text-amber-300">Alerts</span>
+          </button>
+
+          {isAdmin && (
+            <button
+              onClick={() => setLocation("/admin")}
+              className={`flex flex-col items-center gap-0.5 py-1 px-2 rounded-xl transition-all ${
+                location === "/admin"
+                  ? "text-emerald-300 font-bold bg-emerald-500/20"
+                  : "text-emerald-400/80 hover:text-emerald-300"
+              }`}
+            >
+              <ShieldCheck className="h-5 w-5 text-emerald-400" />
+              <span className="text-[10px]">Admin</span>
+            </button>
+          )}
+
+          <button
+            onClick={() => setLocation("/settings")}
+            className={`flex flex-col items-center gap-0.5 py-1 px-2 rounded-xl transition-all ${
+              location === "/settings"
+                ? "text-emerald-400 font-bold bg-emerald-500/15"
+                : "text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            <Settings className="h-5 w-5" />
+            <span className="text-[10px]">Settings</span>
+          </button>
+        </nav>
       </SidebarInset>
     </>
   );
