@@ -12,14 +12,20 @@ export async function fetchApi<T>(endpoint: string, options?: RequestInit): Prom
       ...options,
     });
 
+    if (res.status === 404 && endpoint.startsWith("/auth/me")) {
+      return null;
+    }
+
     if (!res.ok) {
       const errData = await res.json().catch(() => ({}));
-      throw new Error(errData.error || `API error (${res.status}): ${res.statusText}`);
+      throw new Error(errData.error || "Authentication or server request failed.");
     }
 
     return await res.json();
   } catch (err: any) {
-    console.warn(`[GeoAlert API Client] Endpoint ${endpoint} error:`, err?.message || err);
+    if (err?.message === "Failed to fetch") {
+      throw new Error("Unable to connect to server. Please check your internet connection.");
+    }
     throw err;
   }
 }

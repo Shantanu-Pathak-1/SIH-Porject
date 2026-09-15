@@ -71,7 +71,7 @@ class DatabaseStore {
   }): Promise<User> {
     let existing = await this.findUserByEmail(userData.email);
     if (existing) {
-      throw new Error("Account already exists with this email address. Please sign in instead.");
+      throw new Error(`An account already exists with ${userData.email} (Registered as ${existing.role || "User"}). Please sign in instead.`);
     }
 
     const newUser: User = {
@@ -99,11 +99,11 @@ class DatabaseStore {
     const { email, password, role, name } = params;
     let existing = await this.findUserByEmail(email);
     if (!existing) {
-      throw new Error("Account not found. Please check your email or create a new account.");
+      throw new Error(`Account not found for ${email}. Please check your email or click 'Create account' to register.`);
     }
 
     if (existing.status === "blocked") {
-      throw new Error("Account suspended: Access denied by system administrator.");
+      throw new Error(`Account (${email}) suspended: Access denied by system administrator.`);
     }
 
     // Password validation check if password supplied
