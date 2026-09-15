@@ -20,13 +20,13 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/useMobile";
-import { BellRing, History, Home as HomeIcon, LayoutDashboard, LogOut, Map as MapIcon, PanelLeft, ShieldAlert } from "lucide-react";
+import { BellRing, History, Home as HomeIcon, LayoutDashboard, LogOut, Map as MapIcon, PanelLeft, ShieldAlert, ShieldCheck } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
 
-const menuItems = [
+const baseMenuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
   { icon: MapIcon, label: "Full Map View", path: "/map" },
   { icon: History, label: "History & Analytics", path: "/history" },
@@ -113,6 +113,15 @@ function DashboardLayoutContent({
   const isCollapsed = state === "collapsed";
   const [isResizing, setIsResizing] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
+
+  const isAdmin = user?.role === "Admin / Operator";
+
+  const menuItems = [
+    baseMenuItems[0], // Dashboard
+    ...(isAdmin ? [{ icon: ShieldCheck, label: "Admin Control", path: "/admin", isAdmin: true }] : []),
+    ...baseMenuItems.slice(1),
+  ];
+
   const activeMenuItem = menuItems.find(item => item.path === location);
   const isMobile = useIsMobile();
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -158,7 +167,7 @@ function DashboardLayoutContent({
       }
     };
 
-  const handleMouseUp = () => {
+    const handleMouseUp = () => {
       setIsResizing(false);
     };
 
@@ -220,7 +229,11 @@ function DashboardLayoutContent({
                       onClick={() => setLocation(item.path)}
                       tooltip={item.label}
                       className={`h-10 transition-all font-medium ${
-                        item.isYellow
+                        item.isAdmin
+                          ? isActive
+                            ? "bg-emerald-500/25 text-emerald-300 font-bold border border-emerald-500/40"
+                            : "text-emerald-400 hover:bg-emerald-500/15 hover:text-emerald-300 font-semibold"
+                          : item.isYellow
                           ? isActive
                             ? "bg-amber-500/25 text-amber-300 font-bold border border-amber-500/40"
                             : "text-amber-400 hover:bg-amber-500/15 hover:text-amber-300 font-semibold"
@@ -229,7 +242,9 @@ function DashboardLayoutContent({
                     >
                       <item.icon
                         className={`h-4 w-4 shrink-0 ${
-                          item.isYellow
+                          item.isAdmin
+                            ? "text-emerald-400"
+                            : item.isYellow
                             ? "text-amber-400 animate-pulse"
                             : isActive
                             ? "text-emerald-400"
@@ -237,6 +252,11 @@ function DashboardLayoutContent({
                         }`}
                       />
                       <span className="truncate">{item.label}</span>
+                      {item.isAdmin && (
+                        <span className="px-1.5 py-0.5 text-[10px] uppercase tracking-wider font-bold rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 ml-auto shrink-0 group-data-[collapsible=icon]:hidden">
+                          ADMIN
+                        </span>
+                      )}
                       {item.isYellow && (
                         <span className="h-2 w-2 rounded-full bg-amber-400 animate-ping ml-auto shrink-0 group-data-[collapsible=icon]:hidden" />
                       )}
@@ -257,8 +277,9 @@ function DashboardLayoutContent({
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0 group-data-[collapsible=icon]:hidden">
-                    <p className="text-sm font-medium truncate leading-none">
-                      {user?.name || "-"}
+                    <p className="text-sm font-medium truncate leading-none flex items-center gap-1.5">
+                      <span>{user?.name || "-"}</span>
+                      {isAdmin && <ShieldCheck className="h-3.5 w-3.5 text-emerald-400 shrink-0" />}
                     </p>
                     <p className="text-xs text-muted-foreground truncate mt-1.5">
                       {user?.email || "-"}
@@ -289,6 +310,32 @@ function DashboardLayoutContent({
       </div>
 
       <SidebarInset>
+        {/* Admin Dashboard Active Header Notification Indicator */}
+        {isAdmin && (
+          <div className="bg-gradient-to-r from-emerald-950/80 via-emerald-900/60 to-emerald-950/80 border-b border-emerald-500/30 px-4 py-2 flex items-center justify-between shadow-md">
+            <div className="flex items-center gap-2.5">
+              <span className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+              </span>
+              <ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0" />
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-xs sm:text-sm text-emerald-200 tracking-wide uppercase">
+                  🛡️ ADMIN DASHBOARD
+                </span>
+                <span className="text-xs text-emerald-300/80 hidden md:inline">
+                  | System Administrator & Operator Privilege Active
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded">
+                Role: {user.role}
+              </span>
+            </div>
+          </div>
+        )}
+
         {isMobile && (
           <div className="flex border-b h-14 items-center justify-between bg-background/95 px-2 backdrop-blur supports-[backdrop-filter]:backdrop-blur sticky top-0 z-40">
             <div className="flex items-center gap-2">

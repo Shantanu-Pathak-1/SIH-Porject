@@ -134,3 +134,48 @@ apiRouter.post("/broadcasts/dispatch", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+// Admin / Operator Management Routes
+apiRouter.get("/admin/users", async (_req, res) => {
+  try {
+    const users = await dbStore.getUsers();
+    res.json({ success: true, users });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+apiRouter.post("/admin/users/:id/block", async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const updatedUser = await dbStore.toggleBlockUser(userId);
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.json({ success: true, user: updatedUser });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+apiRouter.post("/admin/targeted-alert", async (req, res) => {
+  try {
+    const { state, district, alertTier, title, advisory } = req.body || {};
+    if (!district) {
+      return res.status(400).json({ error: "Target district is required for targeted alert" });
+    }
+
+    const log = await dbStore.createBroadcastLog({
+      district,
+      state: state || "North East Region",
+      channel: "Targeted Geo-Alert Array",
+      recipient: `All Active Citizens in ${district}, ${state || "NER"}`,
+      advisory: advisory || `MANUAL ADMIN ALERT: High hazard risk identified in ${district}. ${title || ""}`,
+    });
+
+    res.json({ success: true, message: `Targeted alert successfully dispatched to ${district}`, log });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+

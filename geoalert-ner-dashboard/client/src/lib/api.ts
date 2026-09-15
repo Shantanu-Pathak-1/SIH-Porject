@@ -98,4 +98,33 @@ export const api = {
     });
     return data?.log || null;
   },
+
+  // Admin / Operator Control API
+  admin: {
+    getUsers: async (): Promise<User[] | null> => {
+      const data = await fetchApi<{ users: User[] }>("/admin/users");
+      return data?.users || null;
+    },
+
+    toggleBlockUser: async (userId: string): Promise<User | null> => {
+      const data = await fetchApi<{ user: User }>(`/admin/users/${userId}/block`, {
+        method: "POST",
+      });
+      return data?.user || null;
+    },
+
+    sendTargetedAlert: async (payload: {
+      state?: string;
+      district: string;
+      alertTier?: string;
+      title?: string;
+      advisory?: string;
+    }): Promise<{ success: boolean; message: string; log: BroadcastLogRecord } | null> => {
+      return fetchApi("/admin/targeted-alert", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+    },
+  },
 };
+

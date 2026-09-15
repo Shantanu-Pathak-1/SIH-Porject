@@ -13,6 +13,7 @@ export interface User {
   token?: string;
   latitude?: number;
   longitude?: number;
+  status?: "active" | "blocked";
 }
 
 export interface DistrictRecord {

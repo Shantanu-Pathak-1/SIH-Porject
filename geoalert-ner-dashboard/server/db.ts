@@ -113,11 +113,23 @@ class DatabaseStore {
     return safeUser as User;
   }
 
-  // User Live GPS Location Hazard Evaluation
+  async toggleBlockUser(userId: string): Promise<User | undefined> {
+    const user = this.users.find((u) => u.id === userId);
+    if (user) {
+      user.status = user.status === "blocked" ? "active" : "blocked";
+      const { password, ...safeUser } = user;
+      return safeUser as User;
+    }
+    return undefined;
+  }
+
+  // User Live GPS Location Hazard Evaluation (2-Tier Alert Classification Engine)
   async evaluateUserGpsHazard(latitude: number, longitude: number): Promise<{
     nearestDistrict: District;
     distanceKm: number;
+    alertTier: "EMERGENCY_EVACUATION" | "NEARBY_CAUTION" | "SAFE";
     hazardAlertRequired: boolean;
+    title: string;
     advisory: string;
   }> {
     await this.syncLiveOpenMeteoSatelliteData();
@@ -144,15 +156,32 @@ class DatabaseStore {
     });
 
     const distanceKm = Number(minDistance.toFixed(1));
-    const alertRequired = nearestDist.risk === "Critical" || nearestDist.risk === "High";
+    const isHighRisk = nearestDist.risk === "Critical" || nearestDist.risk === "High";
+
+    let alertTier: "EMERGENCY_EVACUATION" | "NEARBY_CAUTION" | "SAFE" = "SAFE";
+    let title = "GPS Telemetry Active";
+    let advisory = `Nearest monitoring station is ${nearestDist.name} (${distanceKm} km). Status: Safe.`;
+
+    // Tier 1: Immediate High Risk Zone (< 25km) -> Emergency Evacuation Alert
+    if (distanceKm <= 25 && isHighRisk) {
+      alertTier = "EMERGENCY_EVACUATION";
+      title = `🚨 CRITICAL EVACUATION ALERT: ${nearestDist.name.toUpperCase()}`;
+      advisory = `IMMEDIATE ACTION REQUIRED: You are ${distanceKm} km inside the active ${nearestDist.risk} Landslide Danger Zone (${nearestDist.name}). ${nearestDist.action}`;
+    }
+    // Tier 2: Neighboring / Buffer Zone (25km - 80km) -> Nearby Area Caution Advisory
+    else if (distanceKm <= 80 || isHighRisk) {
+      alertTier = "NEARBY_CAUTION";
+      title = `⚠️ NEARBY AREA CAUTION: ${nearestDist.name}`;
+      advisory = `NEIGHBORING HAZARD NOTICE: You are ${distanceKm} km from ${nearestDist.name} (${nearestDist.risk} Risk zone). Stay alert for heavy rainfall and avoid steep slope corridors.`;
+    }
 
     return {
       nearestDistrict: nearestDist,
       distanceKm,
-      hazardAlertRequired: alertRequired,
-      advisory: alertRequired
-        ? `EMERGENCY HAZARD WARNING: You are ${distanceKm} km from ${nearestDist.name} (${nearestDist.risk} Risk zone). ${nearestDist.action}`
-        : `GPS Telemetry Active: Nearest monitoring station is ${nearestDist.name} (${distanceKm} km). Status: Safe.`,
+      alertTier,
+      hazardAlertRequired: alertTier !== "SAFE",
+      title,
+      advisory,
     };
   }
 

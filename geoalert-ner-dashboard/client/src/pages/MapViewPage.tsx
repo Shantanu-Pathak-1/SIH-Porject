@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { api } from "@/lib/api";
-import { playEmergencySirenSound, triggerBrowserPushNotification } from "@/lib/audioAlert";
+import { triggerTieredAlert } from "@/lib/audioAlert";
 
 export default function MapViewPage() {
   const { user } = useAuth();
@@ -15,16 +15,16 @@ export default function MapViewPage() {
   const [selectedId, setSelectedId] = useState<DistrictId>("tawang");
   const [userCoords, setUserCoords] = useState<[number, number] | null>(null);
   const [gpsLoading, setGpsLoading] = useState(false);
-  const [gpsAdvisory, setGpsAdvisory] = useState<string | null>(null);
+  const [gpsData, setGpsData] = useState<{
+    tier: "EMERGENCY_EVACUATION" | "NEARBY_CAUTION" | "SAFE";
+    title: string;
+    advisory: string;
+  } | null>(null);
 
   const selected = districts.find((d) => d.id === selectedId) || districts[0];
 
   const handleQuickBroadcast = () => {
-    playEmergencySirenSound();
-    triggerBrowserPushNotification(
-      `GEOALERT EMERGENCY SIREN DISPATCH`,
-      `Emergency slope hazard warning dispatched for ${selected.name} (${selected.state}).`
-    );
+    triggerTieredAlert("EMERGENCY_EVACUATION", `🚨 CRITICAL SIREN DISPATCH`, `Emergency warning for ${selected.name} (${selected.state}).`);
 
     api.dispatchBroadcast({
       district: selected.name,
@@ -34,8 +34,8 @@ export default function MapViewPage() {
       advisory: selected.action,
     });
 
-    toast.success(`EMERGENCY SIREN DISPATCHED FOR ${selected.name.toUpperCase()}!`, {
-      description: `Audio Siren & Web Push Triggered · Target: ${selected.name} Disaster Response Force`,
+    toast.error(`EMERGENCY SIREN DISPATCHED FOR ${selected.name.toUpperCase()}!`, {
+      description: `Tier 1 Alarm Siren & Web Push Triggered · Target: ${selected.name} Emergency Unit`,
     });
   };
 
@@ -55,22 +55,20 @@ export default function MapViewPage() {
         setUserCoords([lat, lon]);
         setGpsLoading(false);
 
-        const evalResult = await api.evaluateLocation(lat, lon);
+        const evalResult = (await api.evaluateLocation(lat, lon)) as any;
         if (evalResult) {
-          setGpsAdvisory(evalResult.advisory);
-          if (evalResult.hazardAlertRequired) {
-            playEmergencySirenSound();
-            triggerBrowserPushNotification(
-              "CRITICAL LOCAL HAZARD WARNING",
-              evalResult.advisory
-            );
-            toast.error("HIGH HAZARD ZONE DETECTED NEAR YOUR GPS LOCATION", {
-              description: evalResult.advisory,
-            });
+          const tier = evalResult.alertTier || (evalResult.hazardAlertRequired ? "EMERGENCY_EVACUATION" : "SAFE");
+          const title = evalResult.title || (tier === "EMERGENCY_EVACUATION" ? "CRITICAL LANDSLIDE ALARM" : "NEARBY CAUTION NOTICE");
+          
+          setGpsData({ tier, title, advisory: evalResult.advisory });
+          triggerTieredAlert(tier, title, evalResult.advisory);
+
+          if (tier === "EMERGENCY_EVACUATION") {
+            toast.error(title, { description: evalResult.advisory });
+          } else if (tier === "NEARBY_CAUTION") {
+            toast.warning(title, { description: evalResult.advisory });
           } else {
-            toast.success("GPS Location Acquired", {
-              description: evalResult.advisory,
-            });
+            toast.success("GPS Location Acquired: Safe Zone", { description: evalResult.advisory });
           }
         } else {
           toast.success(`GPS Location Acquired: ${lat.toFixed(4)}° N, ${lon.toFixed(4)}° E`);
@@ -123,10 +121,45 @@ export default function MapViewPage() {
           </div>
         </div>
 
-        {gpsAdvisory && (
-          <div className="p-3 bg-amber-500/15 border border-amber-500/40 rounded-xl text-xs font-mono text-amber-200 flex items-center gap-2 animate-fadeIn">
-            <ShieldAlert size={16} className="text-amber-400 shrink-0 animate-pulse" />
-            <span>{gpsAdvisory}</span>
+        {gpsData && (
+          <div
+            className={cn(
+              "p-3.5 rounded-xl text-xs font-mono flex items-center justify-between gap-3 animate-fadeIn border shadow-lg",
+              gpsData.tier === "EMERGENCY_EVACUATION"
+                ? "bg-red-500/20 text-red-200 border-red-500/60 shadow-red-950/40"
+                : gpsData.tier === "NEARBY_CAUTION"
+                ? "bg-amber-500/15 text-amber-200 border-amber-500/50"
+                : "bg-emerald-500/15 text-emerald-200 border-emerald-500/40"
+            )}
+          >
+            <div className="flex items-center gap-2.5">
+              <ShieldAlert
+                size={18}
+                className={cn(
+                  "shrink-0",
+                  gpsData.tier === "EMERGENCY_EVACUATION"
+                    ? "text-red-400 animate-ping"
+                    : gpsData.tier === "NEARBY_CAUTION"
+                    ? "text-amber-400 animate-pulse"
+                    : "text-emerald-400"
+                )}
+              />
+              <div>
+                <strong className="block text-xs font-bold uppercase tracking-wider">{gpsData.title}</strong>
+                <p className="opacity-90">{gpsData.advisory}</p>
+              </div>
+            </div>
+
+            <span className={cn(
+              "px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider shrink-0 border",
+              gpsData.tier === "EMERGENCY_EVACUATION"
+                ? "bg-red-600 text-white border-red-400 animate-pulse"
+                : gpsData.tier === "NEARBY_CAUTION"
+                ? "bg-amber-500/30 text-amber-300 border-amber-400"
+                : "bg-emerald-500/30 text-emerald-300 border-emerald-400"
+            )}>
+              {gpsData.tier === "EMERGENCY_EVACUATION" ? "Tier 1: Evacuation" : gpsData.tier === "NEARBY_CAUTION" ? "Tier 2: Caution" : "Tier 3: Safe"}
+            </span>
           </div>
         )}
 
