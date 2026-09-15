@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { api } from "@/lib/api";
 
 export interface User {
   id?: string | number;
@@ -30,6 +31,29 @@ export function useAuth() {
     };
   });
 
+  // Sync with Backend API session if available
+  useEffect(() => {
+    if (user?.email) {
+      api.getMe(user.email).then((remoteUser) => {
+        if (remoteUser && remoteUser.role !== user.role) {
+          setUser((curr) => (curr ? { ...curr, role: remoteUser.role, name: remoteUser.name } : curr));
+        }
+      });
+    }
+  }, []);
+
+  const loginWithBackend = async (email: string, role: string, name?: string) => {
+    const backendUser = await api.login(email, role, name);
+    if (backendUser) {
+      localStorage.setItem("geoalert-session", "active");
+      localStorage.setItem("geoalert-user", backendUser.name);
+      localStorage.setItem("geoalert-role", backendUser.role);
+      localStorage.setItem("geoalert-email", backendUser.email);
+      setUser(backendUser);
+    }
+    return backendUser;
+  };
+
   const logout = () => {
     localStorage.removeItem("geoalert-session");
     localStorage.removeItem("geoalert-user");
@@ -45,6 +69,7 @@ export function useAuth() {
     user,
     isAuthenticated: !!user,
     loading: false,
+    loginWithBackend,
     logout,
   };
 }

@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual Environment
+venv/
+env/
+.venv/
+
+# Environment Variables
+.env
+
+# Database
+*.db
+*.sqlite
+
+# ML Model Binary (large file — regenerate with scripts/train_ml_model.py)
+app/models_ml/landslide_risk_model.joblib
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Docker volumes
+postgis_data/
+
+# Node (frontend)
+node_modules/
+frontend/node_modules/

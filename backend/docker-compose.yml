@@ -1,0 +1,72 @@
+version: "3.9"
+
+services:
+  # ─── FastAPI Application ─────────────────────────────────────────────────────
+  api:
+    build: .
+    container_name: geoalert_api
+    restart: unless-stopped
+    ports:
+      - "${API_PORT:-8000}:8000"
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://postgres:postgres@postgis:5432/geoalert_ner}
+      SYNC_DATABASE_URL: ${SYNC_DATABASE_URL:-postgresql+psycopg2://postgres:postgres@postgis:5432/geoalert_ner}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+      SECRET_KEY: ${SECRET_KEY:-GEOALERT_NER_SECRET_CHANGE_IN_PROD}
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
+    depends_on:
+      postgis:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./app/models_ml:/app/app/models_ml
+
+  # ─── PostGIS (PostgreSQL + PostGIS Extension) ────────────────────────────────
+  postgis:
+    image: postgis/postgis:16-3.4-alpine
+    container_name: geoalert_postgis
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: geoalert_ner
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      # Defaults to 5433 on host to prevent collision with native PostgreSQL on 5432
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - postgis_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d geoalert_ner"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── Redis Cache & PubSub Broker ─────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: geoalert_redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # ─── Nginx Reverse Proxy (Frontend SPA + API Gateway) ──────────────────────
+  nginx:
+    image: nginx:alpine
+    container_name: geoalert_nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./frontend/dist:/usr/share/nginx/html:ro
+    depends_on:
+      - api
+
+volumes:
+  postgis_data:

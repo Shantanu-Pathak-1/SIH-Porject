@@ -19,6 +19,7 @@ import {
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { nerLocations, nerStateList } from "@/lib/nerLocationData";
+import { api } from "@/lib/api";
 
 // Simplified to 2 primary roles: Citizen and Admin / Operator
 const roles = ["Citizen", "Admin / Operator"] as const;
@@ -152,11 +153,8 @@ export default function LoginPage() {
         return;
       }
 
-      // Save login session
-      localStorage.setItem("geoalert-session", "active");
-      localStorage.setItem("geoalert-email", email.trim());
-      localStorage.setItem("geoalert-user", email.split("@")[0]);
-      localStorage.setItem("geoalert-role", role);
+      // Save login session & call backend API
+      auth.loginWithBackend(email.trim(), role, email.split("@")[0]);
 
       setSuccessMessage("Signed in successfully! Redirecting...");
       setTimeout(() => {
@@ -259,18 +257,27 @@ export default function LoginPage() {
       return;
     }
 
-    // Save complete verified session with backup location data
-    localStorage.setItem("geoalert-session", "active");
-    localStorage.setItem("geoalert-user", name.trim());
-    localStorage.setItem("geoalert-email", email.trim());
-    localStorage.setItem("geoalert-role", role);
-    localStorage.setItem("geoalert-state", selectedState);
-    localStorage.setItem("geoalert-district", selectedDistrict);
+    // Register user details & password in backend API
+    api.register({
+      name: name.trim(),
+      email: email.trim(),
+      password,
+      role,
+      state: selectedState,
+      district: selectedDistrict,
+    }).then(() => {
+      localStorage.setItem("geoalert-session", "active");
+      localStorage.setItem("geoalert-user", name.trim());
+      localStorage.setItem("geoalert-email", email.trim());
+      localStorage.setItem("geoalert-role", role);
+      localStorage.setItem("geoalert-state", selectedState);
+      localStorage.setItem("geoalert-district", selectedDistrict);
 
-    setSuccessMessage("Gmail verified & Emergency location registered! Redirecting...");
-    setTimeout(() => {
-      window.location.href = "/dashboard";
-    }, 450);
+      setSuccessMessage("Gmail verified & Account Registered! Redirecting...");
+      setTimeout(() => {
+        window.location.href = "/dashboard";
+      }, 450);
+    });
   };
 
   const nextQuote = () => {

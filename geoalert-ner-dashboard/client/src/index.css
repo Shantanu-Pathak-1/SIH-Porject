@@ -1127,8 +1127,75 @@ a { color: inherit; text-decoration: none; }
   margin: 4px 0 0;
   font: 18px var(--font-mono);
 }
-.metric-value span {
-  color: var(--muted-foreground);
-  font-size: 9px;
+/* Interactive Map Layer Selector & Label Badges */
+.map-layer-selector {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  z-index: 500;
+  display: flex;
+  gap: 4px;
+  background: rgba(8, 42, 39, 0.88);
+  backdrop-filter: blur(8px);
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
 }
+.map-layer-selector .layer-btn {
+  padding: 5px 9px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.75);
+  font: 10px var(--font-mono);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 160ms var(--ease-out);
+  white-space: nowrap;
+}
+.map-layer-selector .layer-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+.map-layer-selector .layer-btn.active {
+  background: #10b981;
+  color: #042f2e;
+  font-weight: 700;
+  border-color: #34d399;
+}
+.marker-pin-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.marker-label-badge {
+  position: absolute;
+  left: 24px;
+  top: -4px;
+  background: rgba(9, 45, 41, 0.92);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #ffffff;
+  padding: 3px 7px;
+  border-radius: 6px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+  pointer-events: none;
+  white-space: nowrap;
+}
+.marker-label-badge strong {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.1;
+  color: #ffffff;
+}
+.marker-label-badge small {
+  display: block;
+  font-size: 9px;
+  font-family: var(--font-mono);
+  color: #34d399;
+  margin-top: 1px;
+}
+
 

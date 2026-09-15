@@ -108,7 +108,7 @@ export default function DashboardPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="w-full max-w-full min-w-0 space-y-6 overflow-x-hidden">
         {/* Top Console Bar */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border/40 pb-4">
           <div>

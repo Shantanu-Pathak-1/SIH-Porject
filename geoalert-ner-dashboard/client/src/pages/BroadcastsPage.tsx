@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowUpRight, BellRing, Check, CheckCircle2, ChevronRight, Loader2, Radio, RadioTower, ShieldAlert, X } from "lucide-react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { defaultDistricts, type District, type DistrictId } from "@/lib/districtsData";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { api } from "@/lib/api";
 
 const channels = ["SMS Alert Array", "WhatsApp Emergency Channel", "Local Public Siren Array"];
 
@@ -102,8 +103,14 @@ export default function BroadcastsPage() {
     if (dispatchState !== "idle") return;
     setDispatchState("sending");
 
-    setTimeout(() => {
-      const newLog: BroadcastLog = {
+    api.dispatchBroadcast({
+      district: targetDistrict.name,
+      state: targetDistrict.state,
+      channel: selectedChannel,
+      recipient: `${targetDistrict.name} Disaster Response Unit`,
+      advisory: targetDistrict.action,
+    }).then((resLog) => {
+      const newLog: BroadcastLog = resLog || {
         id: `LOG-${Date.now()}`,
         refCode: `GEO-${targetDistrict.station}-${Math.floor(10 + Math.random() * 89)}`,
         district: targetDistrict.name,
@@ -125,12 +132,12 @@ export default function BroadcastsPage() {
       setTimeout(() => {
         setModalOpen(false);
       }, 1800);
-    }, 1000);
+    });
   };
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="w-full max-w-full min-w-0 space-y-6 overflow-x-hidden">
         {/* Yellow-Themed Prominent Header Box */}
         <div className="bg-amber-500/10 border border-amber-500/40 rounded-2xl p-6 relative overflow-hidden shadow-xl">
           <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-gradient-to-l from-amber-500/10 to-transparent pointer-events-none" />

@@ -1,92 +1,226 @@
-import { eq } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
-import { ENV } from './_core/env';
+import { defaultDistricts, type District } from "../client/src/lib/districtsData";
+import type { BroadcastLogRecord, TelemetryRecord, User } from "../shared/types";
+import { initialBroadcastLogs, initialUsers } from "./schema";
 
-let _db: ReturnType<typeof drizzle> | null = null;
+class DatabaseStore {
+  private users: User[] = [...initialUsers];
+  private districts: District[] = [...defaultDistricts];
+  private broadcasts: BroadcastLogRecord[] = [...initialBroadcastLogs];
+  private lastOpenMeteoSync: number = 0;
 
-// Lazily create the drizzle instance so local tooling can run without a DB.
-export async function getDb() {
-  if (!_db && process.env.DATABASE_URL) {
+  // Fetch real satellite rainfall and soil moisture from Open-Meteo API
+  async syncLiveOpenMeteoSatelliteData(): Promise<void> {
+    const now = Date.now();
+    if (now - this.lastOpenMeteoSync < 300000) return;
+
     try {
-      _db = drizzle(process.env.DATABASE_URL);
-    } catch (error) {
-      console.warn("[Database] Failed to connect:", error);
-      _db = null;
+      this.lastOpenMeteoSync = now;
+      console.log("[GeoAlert Open-Meteo Pipeline] Syncing live satellite weather & soil moisture for NER districts...");
+
+      const promises = this.districts.map(async (district) => {
+        const [lat, lon] = district.coordinates;
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=precipitation,rain,soil_moisture_0_to_1cm&past_days=3`;
+        
+        const res = await fetch(url);
+        if (!res.ok) return;
+        const data = await res.json();
+
+        if (data && data.current) {
+          const liveRain = Math.round((data.current.precipitation || 0) * 10 + 35);
+          const liveSoilMoisture = Math.min(95, Math.round((data.current.soil_moisture_0_to_1cm || 0.45) * 100));
+
+          district.rainfall = Math.max(30, liveRain);
+          district.saturation = Math.max(25, liveSoilMoisture);
+
+          const antecedentScore = (district.rainfall / 160) * 0.45;
+          const saturationScore = (district.saturation / 100) * 0.35;
+          const tiltScore = 0.20;
+          const riskIndex = Number(Math.min(0.98, Math.max(0.20, antecedentScore + saturationScore + tiltScore)).toFixed(2));
+
+          district.riskIndex = riskIndex;
+          if (riskIndex >= 0.78) district.risk = "Critical";
+          else if (riskIndex >= 0.65) district.risk = "High";
+          else if (riskIndex >= 0.48) district.risk = "Moderate";
+          else district.risk = "Low";
+        }
+      });
+
+      await Promise.all(promises);
+      console.log("[GeoAlert Open-Meteo Pipeline] Live sync completed successfully.");
+    } catch (err) {
+      console.warn("[GeoAlert Open-Meteo Pipeline] Weather sync fallback warning:", err);
     }
   }
-  return _db;
-}
 
-export async function upsertUser(user: InsertUser): Promise<void> {
-  if (!user.openId) {
-    throw new Error("User openId is required for upsert");
+  // Users & Authentication API
+  async getUsers(): Promise<User[]> {
+    return this.users.map(({ password, ...rest }) => rest as User);
   }
 
-  const db = await getDb();
-  if (!db) {
-    console.warn("[Database] Cannot upsert user: database not available");
-    return;
+  async findUserByEmail(email: string): Promise<User | undefined> {
+    return this.users.find((u) => u.email.toLowerCase() === email.toLowerCase());
   }
 
-  try {
-    const values: InsertUser = {
-      openId: user.openId,
+  async registerUser(userData: {
+    name: string;
+    email: string;
+    password?: string;
+    role?: string;
+    state?: string;
+    district?: string;
+  }): Promise<User> {
+    let existing = await this.findUserByEmail(userData.email);
+    if (existing) {
+      existing.name = userData.name || existing.name;
+      if (userData.password) existing.password = userData.password;
+      if (userData.role) existing.role = userData.role as any;
+      if (userData.state) existing.state = userData.state;
+      if (userData.district) existing.district = userData.district;
+      const { password, ...safeUser } = existing;
+      return safeUser as User;
+    }
+
+    const newUser: User = {
+      id: `usr-${Date.now()}`,
+      name: userData.name,
+      email: userData.email,
+      password: userData.password || "password123",
+      role: (userData.role as any) || "Citizen",
+      state: userData.state || "Assam",
+      district: userData.district || "Karbi Anglong (Diphu)",
     };
-    const updateSet: Record<string, unknown> = {};
 
-    const textFields = ["name", "email", "loginMethod"] as const;
-    type TextField = (typeof textFields)[number];
+    this.users.push(newUser);
+    const { password, ...safeUser } = newUser;
+    return safeUser as User;
+  }
 
-    const assignNullable = (field: TextField) => {
-      const value = user[field];
-      if (value === undefined) return;
-      const normalized = value ?? null;
-      values[field] = normalized;
-      updateSet[field] = normalized;
-    };
-
-    textFields.forEach(assignNullable);
-
-    if (user.lastSignedIn !== undefined) {
-      values.lastSignedIn = user.lastSignedIn;
-      updateSet.lastSignedIn = user.lastSignedIn;
-    }
-    if (user.role !== undefined) {
-      values.role = user.role;
-      updateSet.role = user.role;
-    } else if (user.openId === ENV.ownerOpenId) {
-      values.role = 'admin';
-      updateSet.role = 'admin';
+  async authenticateUser(email: string, role?: string, name?: string, password?: string): Promise<User> {
+    let existing = await this.findUserByEmail(email);
+    if (!existing) {
+      return this.registerUser({ name: name || email.split("@")[0], email, password, role });
     }
 
-    if (!values.lastSignedIn) {
-      values.lastSignedIn = new Date();
+    // Password validation check if password supplied
+    if (password && existing.password && existing.password !== password) {
+      throw new Error("Invalid email or password");
     }
 
-    if (Object.keys(updateSet).length === 0) {
-      updateSet.lastSignedIn = new Date();
-    }
+    if (role) existing.role = role as any;
+    if (name) existing.name = name;
+    
+    const { password: pwd, ...safeUser } = existing;
+    return safeUser as User;
+  }
 
-    await db.insert(users).values(values).onDuplicateKeyUpdate({
-      set: updateSet,
+  // User Live GPS Location Hazard Evaluation
+  async evaluateUserGpsHazard(latitude: number, longitude: number): Promise<{
+    nearestDistrict: District;
+    distanceKm: number;
+    hazardAlertRequired: boolean;
+    advisory: string;
+  }> {
+    await this.syncLiveOpenMeteoSatelliteData();
+
+    // Haversine formula distance calculation
+    const R = 6371; // Earth radius km
+    let nearestDist = this.districts[0];
+    let minDistance = Infinity;
+
+    this.districts.forEach((dist) => {
+      const [dLat, dLon] = dist.coordinates;
+      const dLatRad = (dLat - latitude) * (Math.PI / 180);
+      const dLonRad = (dLon - longitude) * (Math.PI / 180);
+      const a =
+        Math.sin(dLatRad / 2) * Math.sin(dLatRad / 2) +
+        Math.cos(latitude * (Math.PI / 180)) * Math.cos(dLat * (Math.PI / 180)) * Math.sin(dLonRad / 2) * Math.sin(dLonRad / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      const distance = R * c;
+
+      if (distance < minDistance) {
+        minDistance = distance;
+        nearestDist = dist;
+      }
     });
-  } catch (error) {
-    console.error("[Database] Failed to upsert user:", error);
-    throw error;
+
+    const distanceKm = Number(minDistance.toFixed(1));
+    const alertRequired = nearestDist.risk === "Critical" || nearestDist.risk === "High";
+
+    return {
+      nearestDistrict: nearestDist,
+      distanceKm,
+      hazardAlertRequired: alertRequired,
+      advisory: alertRequired
+        ? `EMERGENCY HAZARD WARNING: You are ${distanceKm} km from ${nearestDist.name} (${nearestDist.risk} Risk zone). ${nearestDist.action}`
+        : `GPS Telemetry Active: Nearest monitoring station is ${nearestDist.name} (${distanceKm} km). Status: Safe.`,
+    };
+  }
+
+  // Districts API
+  async getDistricts(): Promise<District[]> {
+    this.syncLiveOpenMeteoSatelliteData().catch(() => {});
+    return this.districts;
+  }
+
+  async getDistrictById(id: string): Promise<District | undefined> {
+    return this.districts.find((d) => d.id === id);
+  }
+
+  // Telemetry History API
+  async getTelemetryHistory(filter: string = "7days"): Promise<TelemetryRecord[]> {
+    const history: TelemetryRecord[] = [];
+    const count = filter === "today" ? 10 : filter === "yesterday" ? 20 : filter === "7days" ? 40 : 80;
+
+    for (let i = 0; i < count; i++) {
+      const dist = this.districts[i % this.districts.length];
+      const hoursAgo = i * (filter === "today" ? 2 : filter === "yesterday" ? 3 : 6);
+      const time = new Date(Date.now() - hoursAgo * 3600000);
+
+      history.push({
+        id: `tel-${i + 1}`,
+        districtId: dist.id,
+        districtName: dist.name,
+        state: dist.state,
+        rainfall: Math.round(dist.rainfall + (Math.sin(i) * 15)),
+        saturation: Math.round(dist.saturation + (Math.cos(i) * 8)),
+        displacement: Number((1.2 + Math.sin(i) * 0.8).toFixed(2)),
+        riskIndex: Number((dist.riskIndex + (Math.sin(i) * 0.08)).toFixed(2)),
+        timestamp: time.toISOString(),
+      });
+    }
+
+    return history;
+  }
+
+  // Broadcasts API
+  async getBroadcastLogs(): Promise<BroadcastLogRecord[]> {
+    return this.broadcasts;
+  }
+
+  async createBroadcastLog(payload: {
+    district: string;
+    state: string;
+    channel: string;
+    recipient: string;
+    advisory: string;
+  }): Promise<BroadcastLogRecord> {
+    const newLog: BroadcastLogRecord = {
+      id: `LOG-${Date.now()}`,
+      refCode: `GEO-${payload.district.substring(0, 3).toUpperCase()}-${Math.floor(10 + Math.random() * 89)}`,
+      district: payload.district,
+      state: payload.state,
+      channel: payload.channel,
+      recipient: payload.recipient,
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      date: "Today",
+      advisory: payload.advisory,
+      status: "Dispatched",
+      timestamp: Date.now(),
+    };
+
+    this.broadcasts.unshift(newLog);
+    return newLog;
   }
 }
 
-export async function getUserByOpenId(openId: string) {
-  const db = await getDb();
-  if (!db) {
-    console.warn("[Database] Cannot get user: database not available");
-    return undefined;
-  }
-
-  const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
-
-  return result.length > 0 ? result[0] : undefined;
-}
-
-// TODO: add feature queries here as your schema grows.
+export const dbStore = new DatabaseStore();

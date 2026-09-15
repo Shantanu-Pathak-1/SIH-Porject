@@ -1,0 +1,48 @@
+# ─── Version Control & Metadata ──────────────────────────────────────────────
+.git
+.gitignore
+
+# ─── Secrets & Environment Files ─────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+!.env.production.example
+
+# ─── Python Virtual Environments & Cache ─────────────────────────────────────
+venv/
+.venv/
+env/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+coverage/
+htmlcov/
+
+# ─── Node & Frontend Artifacts ───────────────────────────────────────────────
+node_modules/
+frontend/node_modules/
+frontend/dist/
+
+# ─── Logs & Database Files ───────────────────────────────────────────────────
+*.log
+logs/
+*.db
+*.sqlite
+postgis_data/
+
+# ─── IDE & OS Configuration ──────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ─── Temporary / QA Scratch Artifacts ────────────────────────────────────────
+scratch/
+.system_generated/
