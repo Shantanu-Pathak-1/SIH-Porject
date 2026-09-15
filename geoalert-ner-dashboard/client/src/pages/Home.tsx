@@ -82,14 +82,14 @@ export default function Home() {
           </nav>
 
           <div className="top-actions flex items-center gap-2.5">
-            {/* Direct Login Button */}
+            {/* Direct Login / Sign Up Button */}
             <button
               onClick={() => navigate("/login")}
               className="h-9 px-3.5 rounded-md border border-white/20 bg-white/5 hover:bg-white/10 hover:border-amber-400 text-white font-mono text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1.5 transition-all shadow-sm active:scale-95 cursor-pointer"
               title="Sign in to GeoAlert"
             >
               <User size={13} className="text-emerald-300" />
-              {isAuthenticated ? "Account" : "Log In"}
+              {isAuthenticated ? "Account" : "Login / Sign Up"}
             </button>
 
             {/* Sleek Open Dashboard Button */}
@@ -114,7 +114,7 @@ export default function Home() {
                   className="h-9 px-4.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-[11px] uppercase tracking-wider font-semibold flex items-center gap-2 transition-all shadow-md hover:shadow-emerald-500/25 active:scale-95 cursor-pointer"
                   onClick={() => navigate("/login")}
                 >
-                  <Lock size={13} className="text-emerald-200" /> Operator Login <ArrowRight size={14} />
+                  <User size={13} className="text-emerald-200" /> Login / Sign Up <ArrowRight size={14} />
                 </button>
                 <button
                   className="h-9 px-4 rounded-md border border-white/25 bg-white/10 hover:bg-white/20 hover:border-emerald-400 text-white font-mono text-[11px] uppercase tracking-wider font-semibold flex items-center gap-2 transition-all cursor-pointer"
@@ -218,7 +218,7 @@ export default function Home() {
           <div className="footer-brand-col">
             <div className="brand-lockup flex items-center gap-3">
               <img src="/logo.png" alt="GeoAlert Logo" className="h-12 md:h-14 w-auto object-contain shrink-0 filter drop-shadow-sm" />
-              <span><strong className="text-base tracking-wider">GEOALERT</strong><small className="text-[10px] opacity-75"> / ETHRIX</small></span>
+              <span><strong className="text-base tracking-wider">GEOALERT</strong></span>
             </div>
             <p className="footer-tagline">
               AI + GIS-driven landslide early warning platform tailored for Northeast India terrain. Sensor-aware · Response-ready.
@@ -236,7 +236,7 @@ export default function Home() {
               <li><a href="#workflow">02 / Workflow & Signals</a></li>
               <li><a href="#risk-levels">03 / For Response Teams</a></li>
               <li><a href="#field-note">04 / The Field Note</a></li>
-              <li><button onClick={() => navigate("/login")}>Operator Login / Sign In →</button></li>
+              <li><button onClick={() => navigate("/login")}>Login / Sign Up →</button></li>
               <li><button onClick={() => navigate("/dashboard")}>Open Response Console →</button></li>
             </ul>
           </div>
@@ -258,8 +258,7 @@ export default function Home() {
 
         {/* Bottom Bar */}
         <div className="footer-bottom-bar">
-          <span>© 2026 GEOALERT · ETHRIX SIH PROJECT</span>
-          <span className="font-mono text-[10px] opacity-70">LAT 26.2006° N · LON 92.9376° E</span>
+          <span>© 2026 GEOALERT · LANDSLIDE EARLY WARNING SYSTEM</span>
         </div>
       </footer>
     </div>

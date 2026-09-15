@@ -45,13 +45,15 @@ export default function DashboardPage() {
   const [sessionRole] = useState(() => typeof window !== "undefined" ? localStorage.getItem("geoalert-role") || "Disaster Management Authority" : "Disaster Management Authority");
   
   const roleBriefs: Record<string, string> = {
+    "Admin / Operator": "Regional command surface · coordinate response & dispatch broadcast sirens",
+    "Citizen": "Citizen early warning mode · monitor local rainfall, slope hazard & public advisories",
     "Disaster Management Authority": "Regional overview · coordinate multi-district response",
     "District Collector": "District command · approve local action and public warning",
-    "Field Engineer": "Field verification · validate sensor and slope conditions"
+    "Field Engineer": "Field verification · validate sensor and slope conditions",
   };
   
-  const roleBrief = roleBriefs[sessionRole] || "Protected operator · monitor terrain and coordinate response";
-  const canDispatch = sessionRole !== "Field Engineer";
+  const roleBrief = roleBriefs[sessionRole] || "Protected user · monitor terrain and regional alerts";
+  const canDispatch = sessionRole !== "Citizen" && sessionRole !== "Field Engineer";
 
   const [districts, setDistricts] = useState<District[]>(defaultDistricts);
   const [selectedId, setSelectedId] = useState<DistrictId>("tawang");
