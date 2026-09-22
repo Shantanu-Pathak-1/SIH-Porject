@@ -1408,29 +1408,6 @@ a { color: inherit; text-decoration: none; }
 
 /* Enhanced Mobile Touch Ergonomics & Responsive Grids */
 @media (max-width: 640px) {
-  .metric-grid {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
-  .district-list {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 6px;
-  }
-  .district-row {
-    padding: 10px 8px !important;
-    border-radius: 8px;
-    background: rgba(6, 36, 33, 0.6);
-  }
-  .district-row-copy strong {
-    font-size: 12px !important;
-  }
-  .district-row-index {
-    margin-left: auto !important;
-    font-size: 11px !important;
-  }
-  .map-card-header h3 {
-    font-size: 18px !important;
-  }
   .hero-risk-stats {
     grid-template-columns: repeat(3, 1fr) !important;
     gap: 4px !important;
@@ -1448,7 +1425,7 @@ a { color: inherit; text-decoration: none; }
 /* Console sidebar - mobile scrollable compact list */
 @media (max-width: 760px) {
   /* Monitor section - remove excess padding */
-  .monitor-section.\\!mt-0 {
+  .monitor-section {
     margin-top: 0 !important;
   }
 
