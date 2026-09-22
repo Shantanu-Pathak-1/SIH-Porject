@@ -160,7 +160,7 @@ export default function DashboardPage() {
                 <span>WATCHLIST</span>
                 <span>{districts.length.toString().padStart(2, "0")} DISTRICTS</span>
               </div>
-              <div className="district-list max-h-[520px] overflow-y-auto">
+              <div className="district-list max-h-[380px] sm:max-h-[520px] overflow-y-auto sm:overflow-y-auto overflow-x-auto">
                 {districts.map((district) => (
                   <button key={district.id} className={cn("district-row", selectedId === district.id && "district-row-active")} onClick={() => setSelectedId(district.id)}>
                     <span className={cn("district-marker", `marker-${district.risk.toLowerCase()}`)} />
@@ -227,7 +227,7 @@ export default function DashboardPage() {
               <div className="action-topline"><Sparkles size={15} /><span>MODEL RECOMMENDATION</span></div>
               <h4>{selected.risk === "Critical" ? "Move from watch to action." : selected.risk === "High" ? "Prepare to respond." : "Keep the district informed."}</h4>
               <p>{selected.action} Confirm a field reading before dispatching public-facing alerts.</p>
-              <button onClick={openBroadcast}>Review broadcast brief <ArrowUpRight size={14} /></button>
+              <button onClick={openBroadcast} className="text-link">Review broadcast brief <ArrowUpRight size={14} /></button>
             </div>
           </div>
 

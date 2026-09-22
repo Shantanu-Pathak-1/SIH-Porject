@@ -1028,9 +1028,52 @@ a { color: inherit; text-decoration: none; }
   overflow: hidden;
   border-radius: 8px;
 }
+/* Map card MUST have a fixed height so Leaflet can render properly */
+.map-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  /* Critical: give map-card a defined height so the leaflet container can fill it */
+  min-height: 420px;
+  max-height: 600px;
+}
+.map-card .leaflet-map-shell {
+  flex: 1;
+  position: relative;
+  min-height: 300px;
+  overflow: hidden;
+}
+.map-card .leaflet-map {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+.map-card .leaflet-container {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
 @media (max-width: 1024px) {
   .console-layout {
     grid-template-columns: 1fr;
+  }
+  .map-card {
+    min-height: 360px;
+    max-height: 460px;
+  }
+}
+@media (max-width: 760px) {
+  .console-layout {
+    border-radius: 6px;
+  }
+  .map-card {
+    min-height: 280px;
+    max-height: 340px;
+  }
+  .map-card .leaflet-map-shell {
+    min-height: 240px;
   }
 }
 .console-sidebar {
@@ -1147,11 +1190,8 @@ a { color: inherit; text-decoration: none; }
   font-size: 11px;
   line-height: 1.4;
 }
-.map-card {
-  display: flex;
-  flex-direction: column;
-  background: var(--card);
-}
+/* map-card defined above with height constraints - no duplicate needed */
+
 .map-card-header {
   padding: 16px 20px;
   display: flex;
@@ -1400,5 +1440,264 @@ a { color: inherit; text-decoration: none; }
   }
 }
 
+/* ============================================================
+   DASHBOARD MAIN INTERFACE - MOBILE FINAL POLISH
+   Fixes: map overlay, console sizing, detail panels, metrics
+   ============================================================ */
 
+/* Console sidebar - mobile scrollable compact list */
+@media (max-width: 760px) {
+  /* Monitor section - remove excess padding */
+  .monitor-section.\\!mt-0 {
+    margin-top: 0 !important;
+  }
 
+  /* Console layout - single column, no fixed height */
+  .console-layout {
+    min-height: auto;
+    grid-template-columns: 1fr;
+  }
+
+  /* Console sidebar - compact horizontal scroll list on mobile */
+  .console-sidebar {
+    padding: 12px 12px 10px;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* District list: horizontal scroll row on mobile */
+  .district-list {
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 6px;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .district-list::-webkit-scrollbar { display: none; }
+
+  /* Each district row: compact pill on mobile */
+  .district-row {
+    flex: 0 0 auto;
+    min-width: 130px;
+    max-width: 160px;
+    padding: 10px 10px !important;
+    border: 1px solid var(--border);
+    border-bottom: 1px solid var(--border) !important;
+    border-radius: 8px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  .district-row.district-row-active {
+    box-shadow: inset 0 0 0 2px #10b981;
+  }
+  .district-row-copy strong { font-size: 12px; white-space: normal; line-height: 1.2; }
+  .district-row-copy small { font-size: 10px; }
+  .district-row-index { margin-left: auto; font-size: 11px; }
+  /* Hide chevron on mobile pill view */
+  .district-row svg { display: none; }
+
+  /* Sidebar insight - compact on mobile */
+  .sidebar-insight {
+    margin-top: 10px;
+    padding: 10px 0 0;
+    gap: 8px;
+  }
+  .sidebar-insight strong { font-size: 12px; }
+  .sidebar-insight p:last-child { font-size: 10px; }
+
+  /* Map card header */
+  .map-card-header {
+    padding: 10px 12px;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .map-card-header h3 {
+    font-size: 16px !important;
+  }
+  .map-card-header h3 span {
+    font-size: 13px;
+  }
+
+  /* Map footer - wrap */
+  .map-footer {
+    flex-wrap: wrap;
+    padding: 8px 12px;
+    gap: 6px 12px;
+    font-size: 8px;
+  }
+
+  /* Map layer selector - compact on mobile */
+  .map-layer-selector {
+    top: 8px;
+    right: 8px;
+    padding: 3px;
+    gap: 2px;
+  }
+  .map-layer-selector .layer-btn {
+    padding: 4px 6px;
+    font-size: 9px;
+  }
+
+  /* Detail grid - full single column */
+  .detail-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 12px;
+  }
+
+  /* Detail primary card */
+  .detail-primary,
+  .detail-action {
+    padding: 14px 14px;
+    border-radius: 8px;
+  }
+
+  /* Detail topline - compact */
+  .detail-topline {
+    margin-bottom: 10px;
+  }
+
+  /* Detail title row - stack on mobile */
+  .detail-title-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .detail-title-row h3 {
+    font-size: 20px;
+  }
+  .detail-title-row p {
+    font-size: 11px;
+    max-width: 100%;
+  }
+  .risk-index {
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .risk-index span { font-size: 8px; }
+  .risk-index strong { font-size: 24px; }
+
+  /* Metric grid - 2 columns on mobile (not 3) */
+  .metric-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 14px;
+    padding-top: 12px;
+  }
+  .metric-tile { gap: 8px; align-items: center; }
+  .metric-icon { width: 28px; height: 28px; }
+  .metric-value { font-size: 16px; margin-top: 2px; }
+
+  /* Action panel (Model Recommendation) */
+  .action-topline {
+    font-size: 9px;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .detail-action h4 {
+    font-size: 15px;
+    margin: 6px 0 8px;
+    line-height: 1.3;
+  }
+  .detail-action > p {
+    font-size: 12px;
+    line-height: 1.45;
+  }
+  .detail-action button.text-link {
+    font-size: 12px;
+    margin-top: 10px;
+  }
+
+  /* Risk pill */
+  .risk-pill { font-size: 9px; padding: 3px 7px; }
+}
+
+/* Very small screens (≤480px) - extra compactness */
+@media (max-width: 480px) {
+  .metric-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .metric-value { font-size: 14px; }
+  .detail-title-row h3 { font-size: 18px; }
+  .district-row { min-width: 110px; max-width: 140px; }
+  .map-layer-selector .layer-btn { padding: 3px 5px; font-size: 8px; }
+  .map-card { min-height: 240px; max-height: 300px; }
+}
+
+/* ============================================================
+   RISK PILL STYLES (if missing)
+   ============================================================ */
+.risk-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  border: 1px solid currentColor;
+}
+.risk-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: 0 0 auto;
+}
+.risk-pill-low { color: #6eaa86; background: rgba(110,170,134,.12); }
+.risk-pill-moderate { color: #d9aa48; background: rgba(217,170,72,.12); }
+.risk-pill-high { color: #ee8b56; background: rgba(238,139,86,.12); }
+.risk-pill-critical { color: #d75d52; background: rgba(215,93,82,.12); }
+
+/* Action topline base styles */
+.action-topline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--muted-foreground);
+  margin-bottom: 12px;
+}
+.detail-action h4 {
+  margin: 8px 0 10px;
+  font: 500 18px var(--font-display);
+  letter-spacing: -.02em;
+}
+.detail-action > p {
+  color: var(--muted-foreground);
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0;
+}
+.text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 14px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid currentColor;
+  color: var(--ochre-dark);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  cursor: pointer;
+  padding: 0 0 2px;
+  transition: color 180ms var(--ease-out);
+}
+.dark .text-link { color: var(--ochre); }
+.text-link:hover { color: var(--ochre); }
