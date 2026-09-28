@@ -108,7 +108,7 @@ export default function AdminControlPage() {
   // Toggle User Block / Unblock Action
   const handleToggleBlock = async (userToToggle: User) => {
     try {
-      const updated = await api.admin.toggleBlockUser(userToToggle.id);
+      const updated = await api.admin.toggleBlockUser(String(userToToggle.id || ""));
       if (updated) {
         const isBlocked = updated.status === "blocked";
         toast.success(
@@ -423,11 +423,11 @@ export default function AdminControlPage() {
 
                           {/* Location Column */}
                           <TableCell className="py-3.5">
-                            {u.liveLatitude && u.liveLongitude ? (
+                            {(u as any).liveLatitude && (u as any).liveLongitude ? (
                               <div className="space-y-1">
                                 <Badge className="bg-emerald-950 text-emerald-300 border-emerald-500/40 gap-1 font-mono text-xs">
                                   <Navigation className="h-3 w-3 text-emerald-400 animate-pulse" />
-                                  Live GPS: {u.liveLatitude.toFixed(2)}, {u.liveLongitude.toFixed(2)}
+                                  Live GPS: {Number((u as any).liveLatitude).toFixed(2)}, {Number((u as any).liveLongitude).toFixed(2)}
                                 </Badge>
                                 <div className="text-[11px] text-slate-400 pl-1">
                                   {u.district || "NER Region"}, {u.state || "India"}

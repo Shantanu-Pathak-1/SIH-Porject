@@ -76,7 +76,7 @@ export function triggerTieredAlert(
       icon: "/favicon.ico",
       tag: tier,
       renotify: true,
-    });
+    } as any);
   };
 
   if (Notification.permission === "granted") {

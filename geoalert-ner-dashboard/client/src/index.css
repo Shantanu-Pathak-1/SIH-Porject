@@ -1678,3 +1678,88 @@ a { color: inherit; text-decoration: none; }
 }
 .dark .text-link { color: var(--ochre); }
 .text-link:hover { color: var(--ochre); }
+
+/* Ethrix-Nowcast: Leaflet GIS Marker & Grad-CAM styles */
+.marker-pin-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.marker-core {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #10b981;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.risk-marker-critical .marker-core {
+  background: #ef4444;
+  box-shadow: 0 0 14px #ef4444;
+}
+
+.risk-marker-high .marker-core {
+  background: #f97316;
+  box-shadow: 0 0 12px #f97316;
+}
+
+.risk-marker-moderate .marker-core {
+  background: #eab308;
+  box-shadow: 0 0 10px #eab308;
+}
+
+.marker-halo {
+  position: absolute;
+  left: -5px;
+  top: -5px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.4);
+  pointer-events: none;
+}
+
+.risk-marker-critical .marker-halo {
+  background: rgba(239, 68, 68, 0.6);
+}
+
+.marker-label-badge {
+  background: rgba(6, 26, 23, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  padding: 3px 8px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+}
+
+.marker-label-badge strong {
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.marker-label-badge small {
+  font-size: 9px;
+  line-height: 1.2;
+}
+
+.risk-tooltip {
+  background: rgba(8, 34, 31, 0.96) !important;
+  border: 1px solid rgba(16, 185, 129, 0.4) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
+  color: #ffffff !important;
+  padding: 8px 12px !important;
+}
+
+.risk-tooltip::before {
+  border-top-color: rgba(8, 34, 31, 0.96) !important;
+}
+

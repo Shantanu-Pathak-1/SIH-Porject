@@ -365,6 +365,33 @@ export default function LoginPage() {
               </p>
             </div>
 
+            {/* SIH 2026 Judge Demo Instant Access Banner */}
+            <div className="mb-4 p-3 rounded-xl bg-gradient-to-r from-emerald-500/20 via-amber-500/20 to-emerald-500/20 border border-emerald-500/40 shadow-lg">
+              <div className="flex items-center justify-between gap-2">
+                <div>
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-300 font-bold block">
+                    SIH 2026 EVALUATION ACCESS
+                  </span>
+                  <p className="text-xs text-white/90 font-medium">
+                    Testing the prototype for screening?
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    localStorage.setItem("geoalert-session", "active");
+                    localStorage.setItem("geoalert-user", "Evaluation Jury / Judge");
+                    localStorage.setItem("geoalert-role", "Admin / Operator");
+                    localStorage.setItem("geoalert-email", "jury.evaluator@sih.gov.in");
+                    window.location.href = "/dashboard";
+                  }}
+                  className="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-mono text-[11px] font-bold uppercase tracking-wider transition-all shadow cursor-pointer shrink-0"
+                >
+                  ⚡ Enter as Judge
+                </button>
+              </div>
+            </div>
+
             {/* Currently Logged In Indicator (if session exists) */}
             {auth.isAuthenticated && (
               <div className="mb-2 p-2 rounded-xl bg-emerald-950/70 border border-emerald-400/30 flex items-center justify-between gap-2 text-xs">

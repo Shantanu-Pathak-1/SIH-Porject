@@ -1,7 +1,7 @@
 // GeoAlert-NER style: operational evidence is presented like a field log—monospaced, timestamped, and visually subordinate to the action it supports.
 import { useEffect, useState } from "react";
 import { CheckCircle2, ChevronRight, CloudOff, RadioTower, TerminalSquare } from "lucide-react";
-import type { DistrictId } from "@/pages/Home";
+import type { DistrictId } from "@/lib/districtsData";
 
 export type BroadcastHistoryItem = { id: string; district: string; districtId: DistrictId; channel: string; recipient: string; time: string; status: "Dispatched" | "Queued" };
 
