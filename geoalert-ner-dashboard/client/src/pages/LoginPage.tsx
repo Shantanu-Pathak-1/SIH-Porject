@@ -20,6 +20,7 @@ import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { nerLocations, nerStateList } from "@/lib/nerLocationData";
 import { api } from "@/lib/api";
+import EthrixLogo from "@/components/EthrixLogo";
 
 // Simplified to 2 primary roles: Citizen and Admin / Operator
 const roles = ["Citizen", "Admin / Operator"] as const;
@@ -326,11 +327,11 @@ export default function LoginPage() {
           href="/"
           className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-emerald-300/80 hover:text-amber-400 transition-colors bg-white/5 hover:bg-white/10 px-3 py-1 rounded-full border border-emerald-500/20 cursor-pointer"
         >
-          <ArrowLeft size={13} /> Back to GeoAlert
+          <ArrowLeft size={13} /> Back to Ethrix-Nowcast
         </a>
-        <div className="flex items-center gap-2">
-          <img src="/logo.png" alt="GeoAlert Logo" className="h-6 w-auto object-contain filter drop-shadow-sm" />
-          <span className="font-mono text-xs font-bold tracking-widest text-white">GEOALERT</span>
+        <div className="flex items-center gap-2.5">
+          <EthrixLogo size={24} />
+          <span className="font-mono text-xs font-bold tracking-widest text-white">ETHRIX-NOWCAST</span>
         </div>
       </div>
 

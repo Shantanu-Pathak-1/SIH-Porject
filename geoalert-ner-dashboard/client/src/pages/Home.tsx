@@ -4,6 +4,7 @@ import { Activity, ArrowDownRight, ArrowRight, ArrowUpRight, BrainCircuit, Check
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import GeoRiskMap from "@/components/GeoRiskMap";
+import EthrixLogo from "@/components/EthrixLogo";
 import { historicalSimulationSteps } from "@/lib/nowcastData";
 import type { DistrictId } from "@/lib/districtsData";
 
@@ -109,13 +110,14 @@ export default function Home() {
 
         {/* Top Header */}
         <header className="topbar relative z-10">
-          <a className="brand-lockup flex items-center gap-3" href="#top" aria-label="Ethrix-Nowcast home">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-400 via-teal-500 to-amber-500 flex items-center justify-center text-slate-950 font-bold shadow-lg shadow-emerald-500/30">
-              <CloudLightning size={22} className="text-slate-950" />
-            </div>
+          <a className="brand-lockup flex items-center gap-3.5 group cursor-pointer" href="#top" aria-label="Ethrix-Nowcast home">
+            <EthrixLogo size={42} className="group-hover:scale-105 transition-transform" />
             <span className="flex flex-col">
-              <strong className="text-base font-serif tracking-wider text-white font-bold">ETHRIX-NOWCAST</strong>
-              <small className="text-[9px] font-mono text-emerald-400 tracking-wider">
+              <span className="flex items-center gap-1.5 leading-none">
+                <strong className="text-lg font-serif tracking-wider text-white font-bold group-hover:text-emerald-300 transition-colors">ETHRIX</strong>
+                <span className="text-base font-mono font-bold tracking-wider text-emerald-400">-NOWCAST</span>
+              </span>
+              <small className="text-[9px] font-mono text-emerald-400/80 tracking-wider mt-1">
                 SIH PROBLEM ID: 26077 · 2–6H EARLY WARNING
               </small>
             </span>

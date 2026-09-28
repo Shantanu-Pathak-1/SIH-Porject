@@ -25,6 +25,7 @@ import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
+import EthrixLogo from "./EthrixLogo";
 
 type MenuItem = {
   icon: any;
@@ -239,13 +240,22 @@ function DashboardLayoutContent({
                 <PanelLeft className="h-4 w-4 text-muted-foreground" />
               </button>
               {!isCollapsed ? (
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-                  <span className="font-serif font-bold tracking-tight text-white truncate text-base">
-                    Ethrix-Nowcast
-                  </span>
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <EthrixLogo size={28} />
+                  <div className="flex flex-col min-w-0">
+                    <span className="font-serif font-bold tracking-tight text-white truncate text-sm leading-none">
+                      Ethrix-Nowcast
+                    </span>
+                    <span className="text-[8px] font-mono text-emerald-400 tracking-wider mt-0.5">
+                      SIH 26077
+                    </span>
+                  </div>
                 </div>
-              ) : null}
+              ) : (
+                <div className="mx-auto">
+                  <EthrixLogo size={24} />
+                </div>
+              )}
             </div>
           </SidebarHeader>
 
