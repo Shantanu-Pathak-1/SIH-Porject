@@ -23,6 +23,8 @@ export default function GeoRiskMap({
   onOpenXai,
   initialTile = "satellite",
   userLocation,
+  hideOverlays = false,
+  hideControls = false,
 }: {
   districts: District[];
   selectedId: DistrictId;
@@ -31,6 +33,8 @@ export default function GeoRiskMap({
   onOpenXai?: (district: District) => void;
   initialTile?: MapTileStyle;
   userLocation?: [number, number] | null;
+  hideOverlays?: boolean;
+  hideControls?: boolean;
 }) {
   const mapElement = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
@@ -352,66 +356,70 @@ export default function GeoRiskMap({
       <div ref={mapElement} className="leaflet-map w-full h-full" style={{ width: "100%", height: "100%", minHeight: "360px", position: "absolute", inset: 0 }} />
 
       {/* Atmospheric Overlays Selector */}
-      <div className="absolute top-3 left-3 z-[400] flex flex-wrap items-center gap-1.5 p-1.5 rounded-xl bg-black/60 backdrop-blur-xl border border-white/15 shadow-xl">
-        <span className="text-[10px] font-mono text-zinc-400 px-2 uppercase tracking-wider font-semibold">
-          LAYERS:
-        </span>
-        <button
-          type="button"
-          onClick={() => setActiveOverlay("all")}
-          className={`px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all cursor-pointer ${
-            activeOverlay === "all" ? "bg-emerald-500 text-black font-bold shadow-md" : "text-zinc-300 hover:bg-white/10"
-          }`}
-        >
-          Composite All
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveOverlay("gradcam")}
-          className={`px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all cursor-pointer ${
-            activeOverlay === "gradcam" ? "bg-red-500 text-white font-bold shadow-md" : "text-zinc-300 hover:bg-white/10"
-          }`}
-        >
-          🧠 Grad-CAM Heatmap
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveOverlay("radar")}
-          className={`px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all cursor-pointer ${
-            activeOverlay === "radar" ? "bg-amber-500 text-black font-bold shadow-md" : "text-zinc-300 hover:bg-white/10"
-          }`}
-        >
-          📡 Doppler dBZ
-        </button>
-      </div>
+      {!hideOverlays && !hideControls && (
+        <div className="absolute top-3 left-3 z-[400] flex flex-wrap items-center gap-1.5 p-1.5 rounded-xl bg-black/60 backdrop-blur-xl border border-white/15 shadow-xl">
+          <span className="text-[10px] font-mono text-zinc-400 px-2 uppercase tracking-wider font-semibold">
+            LAYERS:
+          </span>
+          <button
+            type="button"
+            onClick={() => setActiveOverlay("all")}
+            className={`px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all cursor-pointer ${
+              activeOverlay === "all" ? "bg-emerald-500 text-black font-bold shadow-md" : "text-zinc-300 hover:bg-white/10"
+            }`}
+          >
+            Composite All
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveOverlay("gradcam")}
+            className={`px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all cursor-pointer ${
+              activeOverlay === "gradcam" ? "bg-red-500 text-white font-bold shadow-md" : "text-zinc-300 hover:bg-white/10"
+            }`}
+          >
+            🧠 Grad-CAM Heatmap
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveOverlay("radar")}
+            className={`px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all cursor-pointer ${
+              activeOverlay === "radar" ? "bg-amber-500 text-black font-bold shadow-md" : "text-zinc-300 hover:bg-white/10"
+            }`}
+          >
+            📡 Doppler dBZ
+          </button>
+        </div>
+      )}
 
       {/* Base Map Style Switcher (Street / Topo / Satellite) */}
-      <div className="map-layer-selector">
-        <button
-          type="button"
-          onClick={() => setTileStyle("satellite")}
-          className={`layer-btn ${tileStyle === "satellite" ? "active" : ""}`}
-          title="High-Res Hybrid Satellite Imagery"
-        >
-          🛰️ Satellite Hybrid
-        </button>
-        <button
-          type="button"
-          onClick={() => setTileStyle("topo")}
-          className={`layer-btn ${tileStyle === "topo" ? "active" : ""}`}
-          title="Topographic Terrain Map - Mountain & Slope Relief"
-        >
-          🏔️ CartoDEM 30m Topo
-        </button>
-        <button
-          type="button"
-          onClick={() => setTileStyle("street")}
-          className={`layer-btn ${tileStyle === "street" ? "active" : ""}`}
-          title="Street Cartography"
-        >
-          🗺️ Street Map
-        </button>
-      </div>
+      {!hideControls && (
+        <div className="map-layer-selector">
+          <button
+            type="button"
+            onClick={() => setTileStyle("satellite")}
+            className={`layer-btn ${tileStyle === "satellite" ? "active" : ""}`}
+            title="High-Res Hybrid Satellite Imagery"
+          >
+            🛰️ Satellite Hybrid
+          </button>
+          <button
+            type="button"
+            onClick={() => setTileStyle("topo")}
+            className={`layer-btn ${tileStyle === "topo" ? "active" : ""}`}
+            title="Topographic Terrain Map - Mountain & Slope Relief"
+          >
+            🏔️ CartoDEM 30m Topo
+          </button>
+          <button
+            type="button"
+            onClick={() => setTileStyle("street")}
+            className={`layer-btn ${tileStyle === "street" ? "active" : ""}`}
+            title="Street Cartography"
+          >
+            🗺️ Street Map
+          </button>
+        </div>
+      )}
 
       {/* Weather & Cloudburst Early Warning Legend */}
       <div className="map-legend !bg-black/75 !backdrop-blur-md !border-white/15">

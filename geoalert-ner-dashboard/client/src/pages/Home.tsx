@@ -1,6 +1,6 @@
 // Ethrix-Nowcast Landing Page: AI-Driven Hyper-Local Weather & Cloudburst Early Warning System (SIH Problem ID: 26077)
 import { useState, useEffect, useRef } from "react";
-import { Activity, ArrowDownRight, ArrowRight, ArrowUpRight, BrainCircuit, Check, ChevronDown, ChevronRight, CloudLightning, CloudRain, Flame, Layers3, Lock, LogIn, LogOut, MapPin, Radio, Satellite, ShieldAlert, Sparkles, User, Zap } from "lucide-react";
+import { Activity, ArrowDownRight, ArrowRight, ArrowUpRight, BrainCircuit, Check, ChevronDown, ChevronRight, CloudLightning, CloudRain, Flame, Lock, LogIn, LogOut, MapPin, Radio, Satellite, ShieldAlert, Sparkles, User, Zap } from "lucide-react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import GeoRiskMap from "@/components/GeoRiskMap";
@@ -189,20 +189,13 @@ export default function Home() {
 
             {/* Hero Visual Card with Live Map Preview */}
             <div className="hero-risk-card" aria-label="Interactive Nowcast Map Preview">
-              <div className="card-topline">
-                <span className="flex items-center gap-1.5 font-mono text-xs text-emerald-300">
-                  <Layers3 size={14} /> Historical Convective Simulation (T-1h Trigger)
-                </span>
-                <span className="muted-label">
-                  <span className="tiny-live-dot" /> Click hotspot to inspect
-                </span>
-              </div>
-              <div className="hero-map-shell">
+              <div className="hero-map-shell !mt-0">
                 <GeoRiskMap
                   districts={districts}
                   selectedId={selectedId}
                   onSelectDistrict={setSelectedId}
                   gradCamZones={activeStep.activeGradCamZones}
+                  hideOverlays={true}
                 />
               </div>
               <div className="hero-risk-stats">
