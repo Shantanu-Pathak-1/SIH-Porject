@@ -31,7 +31,7 @@ export default function EthrixLogo({
             </span>
           </div>
           <span className="text-[9px] font-mono text-emerald-400/80 tracking-wider mt-1">
-            SIH PROBLEM ID: 26077 · 2–6H EARLY WARNING
+            HYPER-LOCAL NOWCASTING · 2–6H EARLY WARNING
           </span>
         </div>
       </div>

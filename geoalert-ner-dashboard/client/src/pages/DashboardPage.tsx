@@ -74,8 +74,8 @@ export default function DashboardPage() {
   const [sessionRole] = useState(
     () =>
       typeof window !== "undefined"
-        ? localStorage.getItem("geoalert-role") || "Evaluation Jury / Operator"
-        : "Evaluation Jury / Operator"
+        ? localStorage.getItem("geoalert-role") || "Command Operator"
+        : "Command Operator"
   );
 
   // Time Slider Step (0 to 5) - Defaulting to Step 3 (T-1h: Critical Cooling Alert)
@@ -164,7 +164,7 @@ export default function DashboardPage() {
             <div className="flex flex-wrap items-center gap-2 text-xs font-mono uppercase tracking-wider mb-1">
               <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
                 <span className="h-2 w-2 rounded-full bg-emerald-400 animate-ping" />
-                ETHRIX-NOWCAST / SIH PROBLEM ID: 26077
+                ETHRIX-NOWCAST / OPERATIONAL SYSTEM
               </span>
               <span className="text-zinc-400">· 5-Tier Early Warning Architecture</span>
             </div>

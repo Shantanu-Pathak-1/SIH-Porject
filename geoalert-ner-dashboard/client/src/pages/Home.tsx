@@ -76,11 +76,11 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
-  const handleInstantJudgeAccess = () => {
+  const handleInstantDemoAccess = () => {
     localStorage.setItem("geoalert-session", "active");
-    localStorage.setItem("geoalert-user", "Evaluation Jury / Judge");
+    localStorage.setItem("geoalert-user", "Demo Operator");
     localStorage.setItem("geoalert-role", "Admin / Operator");
-    localStorage.setItem("geoalert-email", "jury.evaluator@sih.gov.in");
+    localStorage.setItem("geoalert-email", "operator@ethrix-nowcast.in");
     navigate("/dashboard");
   };
 
@@ -118,7 +118,7 @@ export default function Home() {
                 <span className="text-base font-mono font-bold tracking-wider text-emerald-400">-NOWCAST</span>
               </span>
               <small className="text-[9px] font-mono text-emerald-400/80 tracking-wider mt-1">
-                SIH PROBLEM ID: 26077 · 2–6H EARLY WARNING
+                HYPER-LOCAL CLOUDBURST NOWCASTING · 2–6H LEAD TIME
               </small>
             </span>
           </a>
@@ -133,10 +133,10 @@ export default function Home() {
 
           <div className="top-actions flex items-center gap-2.5 relative">
             <button
-              onClick={handleInstantJudgeAccess}
+              onClick={handleInstantDemoAccess}
               className="h-9 px-3.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-lg shadow-emerald-500/25 active:scale-95 cursor-pointer"
             >
-              <Sparkles size={14} /> Judge Demo <ArrowUpRight size={14} />
+              <Sparkles size={14} /> Live Demo <ArrowUpRight size={14} />
             </button>
           </div>
         </header>
@@ -146,9 +146,9 @@ export default function Home() {
           <section className="hero-section">
             <div className="hero-copy">
               <div className="flex flex-wrap items-center gap-2 mb-2">
-                <span className="px-2.5 py-0.5 rounded-full bg-amber-400/20 border border-amber-400/50 text-amber-300 font-mono text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1.5">
-                  <span className="h-2 w-2 rounded-full bg-amber-400 animate-ping" />
-                  SMART INDIA HACKATHON 2026 · PROBLEM ID: 26077
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-400/20 border border-emerald-400/40 text-emerald-300 font-mono text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                  HYPER-LOCAL RADAR &amp; SATELLITE EARLY WARNING ENGINE
                 </span>
               </div>
               <h1 className="!text-white font-bold leading-tight">
@@ -164,9 +164,9 @@ export default function Home() {
               <div className="hero-actions flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5 sm:gap-3 w-full">
                 <button
                   className="h-11 px-5 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-amber-500 hover:from-emerald-400 hover:to-amber-400 text-slate-950 font-mono text-xs uppercase tracking-wider font-bold flex items-center justify-center gap-2 transition-all shadow-xl hover:shadow-emerald-500/30 active:scale-95 cursor-pointer w-full sm:w-auto"
-                  onClick={handleInstantJudgeAccess}
+                  onClick={handleInstantDemoAccess}
                 >
-                  <Sparkles size={15} /> Launch Live Prototype (Judge Access) <ArrowRight size={15} />
+                  <Sparkles size={15} /> Direct Demo Access <ArrowRight size={15} />
                 </button>
                 <a
                   className="secondary-cta !h-11 !px-5 !text-xs !rounded-xl !text-white !border-white/30 hover:!border-amber-400 hover:!text-amber-300 !bg-white/5 flex items-center justify-center w-full sm:w-auto cursor-pointer"
@@ -356,7 +356,7 @@ export default function Home() {
           </p>
           <button
             className="text-link reveal-text reveal-delay-3 cursor-pointer"
-            onClick={handleInstantJudgeAccess}
+            onClick={handleInstantDemoAccess}
           >
             Launch Interactive Nowcast Dashboard <ArrowUpRight size={14} />
           </button>
@@ -387,19 +387,17 @@ export default function Home() {
         <div className="footer-container">
           <div className="footer-brand-col">
             <div className="brand-lockup flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-400 to-amber-500 flex items-center justify-center text-slate-950 font-bold shadow-md">
-                <CloudLightning size={20} />
-              </div>
+              <EthrixLogo size={36} />
               <span>
                 <strong className="text-base tracking-wider text-white">ETHRIX-NOWCAST</strong>
               </span>
             </div>
             <p className="footer-tagline">
-              AI-Driven Hyper-Local Weather &amp; Cloudburst Early Warning System (SIH Problem ID: 26077). 2–6 hour lead time nowcasting with Grad-CAM XAI and Tier-4 bilingual evacuation alerts.
+              AI-Driven Hyper-Local Weather &amp; Cloudburst Early Warning System. 2–6 hour lead time nowcasting with Grad-CAM XAI and Tier-4 bilingual evacuation alerts.
             </p>
             <div className="footer-status-pill">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>ISRO INSAT-3D &amp; CARTODEM PIPELINE READY · SIH 2026</span>
+              <span>ISRO INSAT-3D &amp; CARTODEM OPERATIONAL PIPELINE READY</span>
             </div>
           </div>
 
@@ -409,7 +407,7 @@ export default function Home() {
               <li><a href="#top">Overview</a></li>
               <li><a href="#architecture">5-Tier Architecture</a></li>
               <li><a href="#risk-levels">Atmospheric Triggers</a></li>
-              <li><button onClick={handleInstantJudgeAccess}>Judge Interactive Demo →</button></li>
+              <li><button onClick={handleInstantDemoAccess}>Direct Demo Access →</button></li>
             </ul>
           </div>
 
@@ -428,7 +426,7 @@ export default function Home() {
         </div>
 
         <div className="footer-bottom-bar">
-          <span>© 2026 ETHRIX-NOWCAST · HYPER-LOCAL CLOUDBURST EARLY WARNING (SIH PROBLEM ID: 26077)</span>
+          <span>© 2026 ETHRIX-NOWCAST · HYPER-LOCAL CLOUDBURST EARLY WARNING SYSTEM</span>
         </div>
       </footer>
     </div>

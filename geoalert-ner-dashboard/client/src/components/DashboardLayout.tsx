@@ -72,12 +72,10 @@ export default function DashboardLayout({
     return (
       <div className="flex items-center justify-center min-h-screen bg-[#08221f] text-white p-6">
         <div className="flex flex-col items-center gap-6 p-8 max-w-md w-full rounded-2xl bg-black/40 border border-white/10 shadow-2xl text-center">
-          <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-emerald-500 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30">
-            <ShieldAlert size={26} />
-          </div>
+          <EthrixLogo size={48} />
           <div>
             <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-400 font-bold block mb-1">
-              SIH 2026 · Problem ID: 26077
+              OPERATIONAL NOWCAST ENGINE
             </span>
             <h1 className="text-2xl font-serif font-bold text-white tracking-wide">
               Ethrix-Nowcast
@@ -90,15 +88,15 @@ export default function DashboardLayout({
             <Button
               onClick={() => {
                 localStorage.setItem("geoalert-session", "active");
-                localStorage.setItem("geoalert-user", "Evaluation Jury / Judge");
+                localStorage.setItem("geoalert-user", "Demo Operator");
                 localStorage.setItem("geoalert-role", "Admin / Operator");
-                localStorage.setItem("geoalert-email", "jury.evaluator@sih.gov.in");
+                localStorage.setItem("geoalert-email", "operator@ethrix-nowcast.in");
                 window.location.reload();
               }}
               size="lg"
               className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-black font-mono font-bold tracking-wider uppercase shadow-xl cursor-pointer"
             >
-              ⚡ Launch Interactive Judge Demo
+              ⚡ Direct Demo Access
             </Button>
             <Button
               variant="outline"
@@ -247,7 +245,7 @@ function DashboardLayoutContent({
                       Ethrix-Nowcast
                     </span>
                     <span className="text-[8px] font-mono text-emerald-400 tracking-wider mt-0.5">
-                      SIH 26077
+                      Early Warning Console
                     </span>
                   </div>
                 </div>

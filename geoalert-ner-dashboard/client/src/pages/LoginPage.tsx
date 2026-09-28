@@ -366,29 +366,29 @@ export default function LoginPage() {
               </p>
             </div>
 
-            {/* SIH 2026 Judge Demo Instant Access Banner */}
+            {/* Direct Demo Access Banner */}
             <div className="mb-4 p-3 rounded-xl bg-gradient-to-r from-emerald-500/20 via-amber-500/20 to-emerald-500/20 border border-emerald-500/40 shadow-lg">
               <div className="flex items-center justify-between gap-2">
                 <div>
                   <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-300 font-bold block">
-                    SIH 2026 EVALUATION ACCESS
+                    DIRECT DEMO ACCESS
                   </span>
                   <p className="text-xs text-white/90 font-medium">
-                    Testing the prototype for screening?
+                    Explore live radar &amp; nowcast console instantly
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => {
                     localStorage.setItem("geoalert-session", "active");
-                    localStorage.setItem("geoalert-user", "Evaluation Jury / Judge");
+                    localStorage.setItem("geoalert-user", "Demo Operator");
                     localStorage.setItem("geoalert-role", "Admin / Operator");
-                    localStorage.setItem("geoalert-email", "jury.evaluator@sih.gov.in");
+                    localStorage.setItem("geoalert-email", "operator@ethrix-nowcast.in");
                     window.location.href = "/dashboard";
                   }}
                   className="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-mono text-[11px] font-bold uppercase tracking-wider transition-all shadow cursor-pointer shrink-0"
                 >
-                  ⚡ Enter as Judge
+                  ⚡ Direct Demo Access
                 </button>
               </div>
             </div>
@@ -589,7 +589,7 @@ export default function LoginPage() {
                       <KeyRound size={13} className="absolute left-2.5 top-2.5 text-amber-400" />
                     </div>
                     <p className="text-[10px] text-amber-300/80 mt-1 flex items-center gap-1">
-                      <span>Clearance Code for Demo / Judges:</span>
+                      <span>Demo Access Code:</span>
                       <code className="bg-amber-500/25 px-1 py-0.2 rounded text-amber-200 font-mono font-bold border border-amber-500/40">GEO-2026</code>
                     </p>
                   </div>
