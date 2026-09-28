@@ -1,56 +1,64 @@
-// GeoAlert-NER: Enhanced readable map for citizens and operators with free tile layers (Street, Topo, Satellite)
+// Ethrix-Nowcast: GIS command map with interactive Grad-CAM heatmap overlays, atmospheric layers, and XAI inspection
 import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { District, DistrictId } from "@/lib/districtsData";
+import type { GradCamZone } from "@/lib/nowcastData";
 
 const riskColors: Record<string, string> = {
-  Low: "#6eaa86",
-  Moderate: "#d9aa48",
-  High: "#ee8b56",
-  Critical: "#d75d52",
+  Low: "#10b981", // emerald
+  Moderate: "#eab308", // amber
+  High: "#f97316", // orange
+  Critical: "#ef4444", // red
 };
 
-export type MapTileStyle = "street" | "topo" | "satellite";
+export type MapTileStyle = "satellite" | "topo" | "street";
+export type AtmosphericOverlay = "gradcam" | "radar" | "ctt" | "all";
 
 export default function GeoRiskMap({
   districts,
   selectedId,
   onSelectDistrict,
+  gradCamZones = [],
+  onOpenXai,
   initialTile = "satellite",
   userLocation,
 }: {
   districts: District[];
   selectedId: DistrictId;
   onSelectDistrict: (id: DistrictId) => void;
+  gradCamZones?: GradCamZone[];
+  onOpenXai?: (district: District) => void;
   initialTile?: MapTileStyle;
   userLocation?: [number, number] | null;
 }) {
   const mapElement = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<Record<string, L.Marker>>({});
+  const heatmapLayerRef = useRef<L.LayerGroup | null>(null);
   const userMarkerRef = useRef<L.Marker | null>(null);
   const lastFocusedIdRef = useRef<DistrictId | null>(null);
   const baseTileLayerRef = useRef<L.TileLayer | null>(null);
   const labelTileLayerRef = useRef<L.TileLayer | null>(null);
 
   const [tileStyle, setTileStyle] = useState<MapTileStyle>(initialTile);
+  const [activeOverlay, setActiveOverlay] = useState<AtmosphericOverlay>("all");
 
   // Initialize Map
   useEffect(() => {
     if (!mapElement.current || mapRef.current) return;
 
+    // Center over Himachal / Northern India with view covering Himalayas & NER
     const map = L.map(mapElement.current, {
       zoomControl: false,
       attributionControl: false,
       minZoom: 3,
       maxZoom: 21,
-    }).setView([26.2, 93.4], 5.8);
+    }).setView([31.9, 77.2], 7);
 
     L.control.zoom({ position: "bottomright" }).addTo(map);
     L.control.scale({ position: "bottomleft", imperial: false, metric: true, maxWidth: 100 }).addTo(map);
 
-    // Initial Tile Layer based on tileStyle
     const getTileConfig = (style: MapTileStyle) => {
       if (style === "street") {
         return {
@@ -66,7 +74,6 @@ export default function GeoRiskMap({
           attribution: "Google Maps Terrain",
         };
       }
-      // Satellite Hybrid: Satellite + Villages + Roads + State/District Borders
       return {
         url: "https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
         subdomains: ["0", "1", "2", "3"],
@@ -83,7 +90,6 @@ export default function GeoRiskMap({
     }).addTo(map);
     baseTileLayerRef.current = baseTile;
 
-    // Additional contrast Overlay Labels layer for crystal clear reading
     const labelsTile = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png", {
       maxZoom: 21,
       maxNativeZoom: 19,
@@ -91,60 +97,14 @@ export default function GeoRiskMap({
     }).addTo(map);
     labelTileLayerRef.current = labelsTile;
 
-    const heatmapLayer = L.layerGroup().addTo(map);
-
-    districts.forEach((district) => {
-      const color = riskColors[district.risk];
-      const baseRadius = district.risk === "Critical" ? 36000 : district.risk === "High" ? 27000 : district.risk === "Moderate" ? 22000 : 15000;
-      const heatOpacity = district.risk === "Critical" ? 0.18 : district.risk === "High" ? 0.15 : district.risk === "Moderate" ? 0.11 : 0.08;
-
-      [baseRadius * 1.5, baseRadius * 1.18, baseRadius].forEach((radius, index) =>
-        L.circle(district.coordinates, {
-          radius,
-          color,
-          fillColor: color,
-          fillOpacity: heatOpacity / (index + 1),
-          weight: index === 2 ? 1.25 : 0,
-          opacity: 0.5,
-        }).addTo(heatmapLayer)
-      );
-
-      // Marker with clear HTML label badge for instant reading by normal users
-      const marker = L.marker(district.coordinates, {
-        icon: L.divIcon({
-          className: `risk-marker-container risk-marker-${district.risk.toLowerCase()}`,
-          html: `
-            <div class="marker-pin-wrapper">
-              <span class="marker-halo"></span>
-              <span class="marker-core"></span>
-              <div class="marker-label-badge">
-                <strong>${district.name}</strong>
-                <small>${district.risk} (${district.riskIndex.toFixed(2)})</small>
-              </div>
-            </div>
-          `,
-          iconSize: [110, 42],
-          iconAnchor: [17, 17],
-        }),
-        keyboard: true,
-        title: `${district.name} · ${district.risk} risk`,
-      }).addTo(map);
-
-      marker.bindTooltip(
-        `<strong>${district.name} (${district.state})</strong><br /><span>Risk Level: ${district.risk} · Index: ${district.riskIndex.toFixed(2)}</span><br /><small>${district.action}</small>`,
-        { direction: "top", offset: [0, -14], className: "risk-tooltip" }
-      );
-
-      marker.on("click", () => onSelectDistrict(district.id));
-      markersRef.current[district.id] = marker;
-    });
+    const heatLayer = L.layerGroup().addTo(map);
+    heatmapLayerRef.current = heatLayer;
 
     mapRef.current = map;
     lastFocusedIdRef.current = selectedId;
 
-    const t1 = window.setTimeout(() => map.invalidateSize(), 60);
-    const t2 = window.setTimeout(() => map.invalidateSize(), 250);
-    const t3 = window.setTimeout(() => map.invalidateSize(), 600);
+    const t1 = window.setTimeout(() => map.invalidateSize(), 80);
+    const t2 = window.setTimeout(() => map.invalidateSize(), 300);
 
     let resizeObserver: ResizeObserver | null = null;
     if (mapElement.current && typeof ResizeObserver !== "undefined") {
@@ -157,13 +117,140 @@ export default function GeoRiskMap({
     return () => {
       window.clearTimeout(t1);
       window.clearTimeout(t2);
-      window.clearTimeout(t3);
       resizeObserver?.disconnect();
       map.remove();
       mapRef.current = null;
       markersRef.current = {};
+      heatmapLayerRef.current = null;
     };
   }, []);
+
+  // Reactive Update: Heatmaps & Markers whenever districts, time-step zones or overlay changes!
+  useEffect(() => {
+    const map = mapRef.current;
+    const heatLayer = heatmapLayerRef.current;
+    if (!map || !heatLayer) return;
+
+    // Clear previous dynamic layers
+    heatLayer.clearLayers();
+    Object.values(markersRef.current).forEach((m) => m.remove());
+    markersRef.current = {};
+
+    // 1. Render Grad-CAM Saliency Zones if active
+    if (activeOverlay === "gradcam" || activeOverlay === "all") {
+      gradCamZones.forEach((zone) => {
+        // Multi-ring Grad-CAM attention field
+        const rings = [zone.radiusMeters * 1.4, zone.radiusMeters, zone.radiusMeters * 0.6];
+        rings.forEach((radius, i) => {
+          L.circle(zone.center, {
+            radius,
+            color: zone.heatColor,
+            fillColor: zone.heatColor,
+            fillOpacity: (zone.intensity * 0.45) / (i + 1),
+            weight: i === 2 ? 2 : 0,
+            opacity: 0.8,
+            dashArray: i === 2 ? "4, 6" : undefined,
+          }).addTo(heatLayer);
+        });
+
+        // Pulsing Grad-CAM core label
+        L.marker(zone.center, {
+          icon: L.divIcon({
+            className: "gradcam-hotspot-label",
+            html: `
+              <div class="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-red-950/80 border border-red-500/80 text-[10px] font-mono text-red-200 shadow-xl backdrop-blur-md whitespace-nowrap pointer-events-none">
+                <span class="h-2 w-2 rounded-full bg-red-500 animate-ping"></span>
+                <strong>Grad-CAM Core (${(zone.intensity * 100).toFixed(0)}%)</strong>
+              </div>
+            `,
+            iconSize: [140, 24],
+            iconAnchor: [70, 12],
+          }),
+        }).addTo(heatLayer);
+      });
+    }
+
+    // 2. Render District Heatmap Rings & Markers
+    districts.forEach((district) => {
+      const color = riskColors[district.risk] || "#10b981";
+      const isCritical = district.risk === "Critical";
+      const isHigh = district.risk === "High";
+
+      const baseRadius = isCritical ? 34000 : isHigh ? 26000 : district.risk === "Moderate" ? 20000 : 14000;
+      const heatOpacity = isCritical ? 0.35 : isHigh ? 0.25 : 0.12;
+
+      // Draw atmospheric concentric influence rings
+      [baseRadius * 1.5, baseRadius * 1.15, baseRadius].forEach((radius, index) => {
+        L.circle(district.coordinates, {
+          radius,
+          color,
+          fillColor: color,
+          fillOpacity: heatOpacity / (index + 1.2),
+          weight: index === 2 ? 1.5 : 0,
+          opacity: 0.6,
+        }).addTo(heatLayer);
+      });
+
+      // Display key atmospheric metric on badge
+      const displayMetric = district.cloudburstProb
+        ? `⚡ ${district.cloudburstProb}% Nowcast`
+        : district.cloudTopTemp
+        ? `CTT ${district.cloudTopTemp}°C`
+        : `${district.risk} (${district.riskIndex.toFixed(2)})`;
+
+      const marker = L.marker(district.coordinates, {
+        icon: L.divIcon({
+          className: `risk-marker-container risk-marker-${district.risk.toLowerCase()} cursor-pointer`,
+          html: `
+            <div class="marker-pin-wrapper group">
+              <span class="marker-halo ${isCritical ? "animate-ping opacity-75" : ""}"></span>
+              <span class="marker-core"></span>
+              <div class="marker-label-badge !min-w-[120px] transition-transform duration-200 group-hover:scale-105">
+                <strong class="text-white flex items-center justify-between gap-1">
+                  <span>${district.name.split(" ")[0]}</span>
+                  <span class="text-[9px] font-mono text-emerald-300 font-normal">XAI</span>
+                </strong>
+                <small class="font-mono ${isCritical ? "text-red-300 font-bold" : "text-zinc-200"}">
+                  ${displayMetric}
+                </small>
+              </div>
+            </div>
+          `,
+          iconSize: [130, 44],
+          iconAnchor: [18, 18],
+        }),
+        keyboard: true,
+        title: `${district.name} · ${district.risk} Risk · Click for Tier-3 XAI Verification`,
+      }).addTo(map);
+
+      // Tooltip with full atmospheric stats
+      const cttText = district.cloudTopTemp !== undefined ? `Cloud Top: ${district.cloudTopTemp}°C` : "";
+      const capeText = district.cape !== undefined ? `CAPE: ${district.cape} J/kg` : "";
+      const radarText = district.radarReflectivity !== undefined ? `Radar: ${district.radarReflectivity} dBZ` : "";
+
+      marker.bindTooltip(
+        `
+          <div class="p-1 font-sans">
+            <strong class="text-sm block font-serif text-white">${district.name} (${district.state})</strong>
+            <span class="text-xs text-amber-300 font-mono block mt-0.5">Threat: ${district.threatCategory || district.risk} · Prob: ${district.cloudburstProb || 0}%</span>
+            <div class="text-[11px] font-mono text-zinc-300 mt-1 space-y-0.5 border-t border-white/20 pt-1">
+              <div>${cttText} ${radarText ? `· ${radarText}` : ""}</div>
+              <div>${capeText} ${district.leadTime ? `· Lead: ${district.leadTime}` : ""}</div>
+            </div>
+            <small class="text-[10px] text-emerald-400 font-mono block mt-1">▶ Click to inspect Tier-3 Grad-CAM</small>
+          </div>
+        `,
+        { direction: "top", offset: [0, -16], className: "risk-tooltip" }
+      );
+
+      marker.on("click", () => {
+        onSelectDistrict(district.id);
+        if (onOpenXai) onOpenXai(district);
+      });
+
+      markersRef.current[district.id] = marker;
+    });
+  }, [districts, gradCamZones, activeOverlay, onSelectDistrict, onOpenXai]);
 
   // Update Base Tile Layer when style changes
   useEffect(() => {
@@ -252,7 +339,7 @@ export default function GeoRiskMap({
         return;
       }
       map.stop();
-      map.flyTo(selected.coordinates, 6.3, { duration: 0.65 });
+      map.flyTo(selected.coordinates, 8, { duration: 0.8 });
     };
     lastFocusedIdRef.current = selectedId;
     const focusTimer = window.setTimeout(focusMap, 80);
@@ -261,18 +348,52 @@ export default function GeoRiskMap({
   }, [selectedId, districts]);
 
   return (
-    <div className="leaflet-map-shell w-full h-full relative" style={{ width: "100%", height: "100%", minHeight: "280px" }}>
-      <div ref={mapElement} className="leaflet-map w-full h-full" style={{ width: "100%", height: "100%", minHeight: "280px", position: "absolute", inset: 0 }} />
+    <div className="leaflet-map-shell w-full h-full relative" style={{ width: "100%", height: "100%", minHeight: "360px" }}>
+      <div ref={mapElement} className="leaflet-map w-full h-full" style={{ width: "100%", height: "100%", minHeight: "360px", position: "absolute", inset: 0 }} />
 
-      {/* Free Interactive Layer Switcher (Street / Topo / Satellite) */}
+      {/* Atmospheric Overlays Selector */}
+      <div className="absolute top-3 left-3 z-[400] flex flex-wrap items-center gap-1.5 p-1.5 rounded-xl bg-black/60 backdrop-blur-xl border border-white/15 shadow-xl">
+        <span className="text-[10px] font-mono text-zinc-400 px-2 uppercase tracking-wider font-semibold">
+          LAYERS:
+        </span>
+        <button
+          type="button"
+          onClick={() => setActiveOverlay("all")}
+          className={`px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all cursor-pointer ${
+            activeOverlay === "all" ? "bg-emerald-500 text-black font-bold shadow-md" : "text-zinc-300 hover:bg-white/10"
+          }`}
+        >
+          Composite All
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveOverlay("gradcam")}
+          className={`px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all cursor-pointer ${
+            activeOverlay === "gradcam" ? "bg-red-500 text-white font-bold shadow-md" : "text-zinc-300 hover:bg-white/10"
+          }`}
+        >
+          🧠 Grad-CAM Heatmap
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveOverlay("radar")}
+          className={`px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all cursor-pointer ${
+            activeOverlay === "radar" ? "bg-amber-500 text-black font-bold shadow-md" : "text-zinc-300 hover:bg-white/10"
+          }`}
+        >
+          📡 Doppler dBZ
+        </button>
+      </div>
+
+      {/* Base Map Style Switcher (Street / Topo / Satellite) */}
       <div className="map-layer-selector">
         <button
           type="button"
-          onClick={() => setTileStyle("street")}
-          className={`layer-btn ${tileStyle === "street" ? "active" : ""}`}
-          title="Normal Street Map - Easy to read for everyone"
+          onClick={() => setTileStyle("satellite")}
+          className={`layer-btn ${tileStyle === "satellite" ? "active" : ""}`}
+          title="High-Res Hybrid Satellite Imagery"
         >
-          🗺️ Street (Normal)
+          🛰️ Satellite Hybrid
         </button>
         <button
           type="button"
@@ -280,27 +401,32 @@ export default function GeoRiskMap({
           className={`layer-btn ${tileStyle === "topo" ? "active" : ""}`}
           title="Topographic Terrain Map - Mountain & Slope Relief"
         >
-          🏔️ Topo / Terrain
+          🏔️ CartoDEM 30m Topo
         </button>
         <button
           type="button"
-          onClick={() => setTileStyle("satellite")}
-          className={`layer-btn ${tileStyle === "satellite" ? "active" : ""}`}
-          title="Satellite Aerial View"
+          onClick={() => setTileStyle("street")}
+          className={`layer-btn ${tileStyle === "street" ? "active" : ""}`}
+          title="Street Cartography"
         >
-          🛰️ Satellite
+          🗺️ Street Map
         </button>
       </div>
 
-      {/* Map Legend */}
-      <div className="map-legend">
-        <span><i className="legend-dot legend-low" /> Safe</span>
-        <span><i className="legend-dot legend-moderate" /> Moderate</span>
-        <span><i className="legend-dot legend-high" /> High</span>
-        <span><i className="legend-dot legend-critical" /> Critical</span>
+      {/* Weather & Cloudburst Early Warning Legend */}
+      <div className="map-legend !bg-black/75 !backdrop-blur-md !border-white/15">
+        <span className="font-mono text-[10px] text-zinc-400 uppercase tracking-wider mr-1 hidden sm:inline">
+          Threat Thresholds:
+        </span>
+        <span><i className="legend-dot legend-low" /> Advisory (CAPE &lt; 1500)</span>
+        <span><i className="legend-dot legend-moderate" /> Watch (CAPE 1500-2200)</span>
+        <span><i className="legend-dot legend-high" /> Warning (Radar &gt; 45 dBZ)</span>
+        <span><i className="legend-dot legend-critical" /> Critical (Cloudburst 88%+)</span>
       </div>
-      <div className="map-attribution">OpenStreetMap · CartoDB · Esri</div>
+
+      <div className="map-attribution !bg-black/60 !text-[10px] !text-zinc-400">
+        Ethrix-Nowcast · INSAT-3D TIR1 · NCMRWF IMDAA · ISRO CartoDEM
+      </div>
     </div>
   );
 }
-

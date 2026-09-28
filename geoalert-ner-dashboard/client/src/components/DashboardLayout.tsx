@@ -69,23 +69,44 @@ export default function DashboardLayout({
 
   if (!user) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="flex flex-col items-center gap-8 p-8 max-w-md w-full">
-          <div className="flex flex-col items-center gap-6">
-            <h1 className="text-2xl font-semibold tracking-tight text-center">
-              Sign in to continue
+      <div className="flex items-center justify-center min-h-screen bg-[#08221f] text-white p-6">
+        <div className="flex flex-col items-center gap-6 p-8 max-w-md w-full rounded-2xl bg-black/40 border border-white/10 shadow-2xl text-center">
+          <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-emerald-500 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30">
+            <ShieldAlert size={26} />
+          </div>
+          <div>
+            <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-400 font-bold block mb-1">
+              SIH 2026 · Problem ID: 26077
+            </span>
+            <h1 className="text-2xl font-serif font-bold text-white tracking-wide">
+              Ethrix-Nowcast
             </h1>
-            <p className="text-sm text-muted-foreground text-center max-w-sm">
-              Access to this dashboard requires authentication. Continue to launch the login flow.
+            <p className="text-xs text-zinc-300 mt-2 leading-relaxed font-sans">
+              AI-Driven Hyper-Local Weather &amp; Cloudburst Early Warning System with 2–6h Lead Time.
             </p>
           </div>
-          <Button
-            onClick={() => window.location.href = "/login"}
-            size="lg"
-            className="w-full shadow-lg hover:shadow-xl transition-all"
-          >
-            Sign in
-          </Button>
+          <div className="w-full space-y-2.5 pt-2">
+            <Button
+              onClick={() => {
+                localStorage.setItem("geoalert-session", "active");
+                localStorage.setItem("geoalert-user", "Evaluation Jury / Judge");
+                localStorage.setItem("geoalert-role", "Admin / Operator");
+                localStorage.setItem("geoalert-email", "jury.evaluator@sih.gov.in");
+                window.location.reload();
+              }}
+              size="lg"
+              className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-black font-mono font-bold tracking-wider uppercase shadow-xl cursor-pointer"
+            >
+              ⚡ Launch Interactive Judge Demo
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => (window.location.href = "/login")}
+              className="w-full border-white/20 text-zinc-300 hover:text-white hover:bg-white/10 text-xs font-mono cursor-pointer"
+            >
+              Operator Sign In
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -219,8 +240,9 @@ function DashboardLayoutContent({
               </button>
               {!isCollapsed ? (
                 <div className="flex items-center gap-2 min-w-0">
-                  <span className="font-semibold tracking-tight truncate">
-                    Navigation
+                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                  <span className="font-serif font-bold tracking-tight text-white truncate text-base">
+                    Ethrix-Nowcast
                   </span>
                 </div>
               ) : null}
