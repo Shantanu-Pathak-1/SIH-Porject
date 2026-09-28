@@ -18,17 +18,17 @@ const timeFilterOptions = [
 ];
 
 const mockIncidents = [
-  { id: "INC-901", date: "2026-09-15 14:30", district: "Tawang", state: "Arunachal Pradesh", rainfallPeak: "142 mm", saturationPeak: "88%", maxRisk: "Critical", status: "Alert Dispatched" },
-  { id: "INC-898", date: "2026-09-14 08:15", district: "East Khasi Hills", state: "Meghalaya", rainfallPeak: "128 mm", saturationPeak: "84%", maxRisk: "High", status: "Siren Activated" },
-  { id: "INC-885", date: "2026-09-12 19:40", district: "Dima Hasao", state: "Assam", rainfallPeak: "115 mm", saturationPeak: "79%", maxRisk: "High", status: "Buffered Edge" },
-  { id: "INC-872", date: "2026-09-10 11:10", district: "West Siang", state: "Arunachal Pradesh", rainfallPeak: "135 mm", saturationPeak: "86%", maxRisk: "Critical", status: "SMS Broadcast" },
-  { id: "INC-860", date: "2026-09-08 16:50", district: "Ukhrul", state: "Manipur", rainfallPeak: "96 mm", saturationPeak: "74%", maxRisk: "Moderate", status: "Routine Log" },
+  { id: "INC-901", date: "2026-09-15 17:45", district: "Dharamshala (Bhagsu)", state: "Himachal Pradesh", rainfallPeak: "114 mm/h", saturationPeak: "94%", maxRisk: "Critical", status: "Cloudburst Verified" },
+  { id: "INC-898", date: "2026-09-14 16:30", district: "Mandi (Beas Gorge)", state: "Himachal Pradesh", rainfallPeak: "88 mm/h", saturationPeak: "91%", maxRisk: "Critical", status: "Flash Flood Alert" },
+  { id: "INC-885", date: "2026-09-12 18:20", district: "Kedarnath", state: "Uttarakhand", rainfallPeak: "92 mm/h", saturationPeak: "96%", maxRisk: "Critical", status: "Siren Activated" },
+  { id: "INC-872", date: "2026-09-10 14:10", district: "East Khasi Hills (Sohra)", state: "Meghalaya", rainfallPeak: "122 mm/h", saturationPeak: "98%", maxRisk: "Critical", status: "SMS Broadcast" },
+  { id: "INC-860", date: "2026-09-08 16:50", district: "Kullu (Parvati)", state: "Himachal Pradesh", rainfallPeak: "68 mm/h", saturationPeak: "86%", maxRisk: "High", status: "Routine Log" },
 ];
 
 export default function HistoryPage() {
   const { theme } = useTheme();
   const [districts, setDistricts] = useState<District[]>(defaultDistricts);
-  const [selectedId, setSelectedId] = useState<DistrictId>("tawang");
+  const [selectedId, setSelectedId] = useState<DistrictId>("dharamshala");
   const [timeFilter, setTimeFilter] = useState("7days");
   const [telemetryLogs, setTelemetryLogs] = useState<TelemetryRecord[]>([]);
   const [lastUpdated] = useState(() => new Date());
@@ -49,7 +49,7 @@ export default function HistoryPage() {
 
   const handleExportReport = () => {
     toast.success(`Exporting ${timeFilter.toUpperCase()} telemetry report for ${selected.name}`, {
-      description: "File: GEOALERT_TELEMETRY_REPORT.csv · 1,480 telemetry records processed",
+      description: "File: ETHRIX_NOWCAST_REPORT.csv · 1,480 spatiotemporal telemetry records processed",
     });
   };
 
@@ -61,13 +61,13 @@ export default function HistoryPage() {
           <div>
             <div className="flex items-center gap-2 text-xs font-mono text-emerald-400 uppercase tracking-wider mb-1">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              HISTORICAL TELEMETRY & ANALYTICS
+              ETHRIX-NOWCAST / HISTORICAL REANALYSIS &amp; AUDIT
             </div>
             <h1 className="text-2xl font-serif font-bold text-foreground">
-              History, Trends & Audit Reports
+              History, Trends &amp; Cloudburst Audit
             </h1>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Multi-day rainfall curves, sensor telemetry logs and historical landslide hazard reports
+              Earthformer Spatiotemporal re-runs, radar reflectivity curves, and extreme rainfall audit records
             </p>
           </div>
 

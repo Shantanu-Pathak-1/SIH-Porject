@@ -1,21 +1,26 @@
-// GeoAlert Landing Page: Clean, modern climate-tech surface for North-East India landslide early warning.
+// Ethrix-Nowcast Landing Page: AI-Driven Hyper-Local Weather & Cloudburst Early Warning System (SIH Problem ID: 26077)
 import { useState, useEffect, useRef } from "react";
-import { Activity, ArrowDownRight, ArrowRight, ArrowUpRight, ChevronDown, ChevronRight, Layers3, Lock, LogIn, LogOut, MapPin, Radio, ShieldAlert, User } from "lucide-react";
+import { Activity, ArrowDownRight, ArrowRight, ArrowUpRight, BrainCircuit, Check, ChevronDown, ChevronRight, CloudLightning, CloudRain, Flame, Layers3, Lock, LogIn, LogOut, MapPin, Radio, Satellite, ShieldAlert, Sparkles, User, Zap } from "lucide-react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import GeoRiskMap from "@/components/GeoRiskMap";
-import { defaultDistricts, type DistrictId } from "@/lib/districtsData";
+import { historicalSimulationSteps } from "@/lib/nowcastData";
+import type { DistrictId } from "@/lib/districtsData";
 
 export default function Home() {
   const auth = useAuth();
   const [, navigate] = useLocation();
   const isAuthenticated = auth.isAuthenticated;
-  const [districts] = useState(defaultDistricts);
-  const [selectedId, setSelectedId] = useState<DistrictId>("tawang");
+
+  // Primed with step 3 (T-1h Trigger phase) for dramatic and realistic presentation
+  const [simulationStep] = useState(3);
+  const activeStep = historicalSimulationSteps[simulationStep];
+  const [districts] = useState(activeStep.districts);
+  const [selectedId, setSelectedId] = useState<DistrictId>("dharamshala");
 
   const selected = districts.find((d) => d.id === selectedId) || districts[0];
 
-  // Topbar Account popover state (hover and click)
+  // Topbar Account popover state
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const accountMenuRef = useRef<HTMLDivElement>(null);
   const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -70,11 +75,19 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
+  const handleInstantJudgeAccess = () => {
+    localStorage.setItem("geoalert-session", "active");
+    localStorage.setItem("geoalert-user", "Evaluation Jury / Judge");
+    localStorage.setItem("geoalert-role", "Admin / Operator");
+    localStorage.setItem("geoalert-email", "jury.evaluator@sih.gov.in");
+    navigate("/dashboard");
+  };
+
   return (
     <div className="app-shell">
-      {/* Top Hero Container with Video Background - Pure Dark Climate-Tech Aesthetic */}
+      {/* Top Hero Container with Video / Gradient Background */}
       <div className="relative overflow-hidden bg-[#082a27]">
-        {/* Background Video Layer - High Visibility & Vibrancy */}
+        {/* Background Video Layer */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           <video
             autoPlay
@@ -83,177 +96,45 @@ export default function Home() {
             playsInline
             preload="auto"
             poster="/hero-poster.webp"
-            className="w-full h-full object-cover opacity-70 filter brightness-105 contrast-105 scale-105 transition-all duration-700"
+            className="w-full h-full object-cover opacity-60 filter brightness-105 contrast-105 scale-105 transition-all duration-700"
           >
             <source src="/hero-bg.webm" type="video/webm" />
             <source src="/videos/hero-bg.webm" type="video/webm" />
             <source src="/hero-bg.mp4" type="video/mp4" />
             <source src="/videos/hero-bg.mp4" type="video/mp4" />
           </video>
-          {/* Refined gradient overlays: Soft so video is clearly visible while text pops */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#082a27]/55 via-[#082a27]/25 to-[#082a27]/85" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#082a27]/20 to-[#082a27]/80" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#082a27]/60 via-[#082a27]/30 to-[#082a27]/90" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#082a27]/20 to-[#082a27]/85" />
         </div>
 
-        {/* Completely Transparent Top Header - Clean White & Emerald Brand */}
+        {/* Top Header */}
         <header className="topbar relative z-10">
-          <a className="brand-lockup flex items-center gap-3" href="#top" aria-label="GeoAlert home">
-            <img src="/logo.png" alt="GeoAlert Logo" className="h-11 md:h-12 w-auto object-contain shrink-0 filter drop-shadow-md transition-transform hover:scale-105" />
+          <a className="brand-lockup flex items-center gap-3" href="#top" aria-label="Ethrix-Nowcast home">
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-400 via-teal-500 to-amber-500 flex items-center justify-center text-slate-950 font-bold shadow-lg shadow-emerald-500/30">
+              <CloudLightning size={22} className="text-slate-950" />
+            </div>
             <span className="flex flex-col">
-              <strong className="text-sm font-mono tracking-widest text-white font-bold">GEOALERT</strong>
-              <small className="text-[9px] font-mono text-emerald-400 tracking-wider">EARLY WARNING SYSTEM</small>
+              <strong className="text-base font-serif tracking-wider text-white font-bold">ETHRIX-NOWCAST</strong>
+              <small className="text-[9px] font-mono text-emerald-400 tracking-wider">
+                SIH PROBLEM ID: 26077 · 2–6H EARLY WARNING
+              </small>
             </span>
           </a>
 
-          {/* Clean Nav Links */}
+          {/* Nav Links */}
           <nav className="hidden md:flex items-center gap-8">
             <a href="#top" className="text-xs font-mono uppercase tracking-wider text-white/75 hover:text-emerald-300 transition-colors">Overview</a>
-            <a href="#workflow" className="text-xs font-mono uppercase tracking-wider text-white/75 hover:text-emerald-300 transition-colors">Workflow</a>
-            <a href="#risk-levels" className="text-xs font-mono uppercase tracking-wider text-white/75 hover:text-emerald-300 transition-colors">Risk Levels</a>
-            <a href="#field-note" className="text-xs font-mono uppercase tracking-wider text-white/75 hover:text-emerald-300 transition-colors">Field Note</a>
+            <a href="#architecture" className="text-xs font-mono uppercase tracking-wider text-white/75 hover:text-emerald-300 transition-colors">5-Tier Architecture</a>
+            <a href="#risk-levels" className="text-xs font-mono uppercase tracking-wider text-white/75 hover:text-emerald-300 transition-colors">Risk Triggers</a>
+            <a href="#field-note" className="text-xs font-mono uppercase tracking-wider text-white/75 hover:text-emerald-300 transition-colors">Earthformer AI</a>
           </nav>
 
           <div className="top-actions flex items-center gap-2.5 relative">
-            {/* Account / Login Interactive Popover Container */}
-            <div
-              ref={accountMenuRef}
-              className="relative"
-              onMouseEnter={handleMouseEnter}
-              onMouseLeave={handleMouseLeave}
-            >
-              <button
-                onClick={() => setIsAccountOpen((prev) => !prev)}
-                className={`h-9 px-3 rounded-md border ${
-                  isAccountOpen
-                    ? "border-emerald-400 bg-emerald-500/20 text-emerald-200"
-                    : "border-white/20 bg-white/5 hover:bg-white/10 hover:border-emerald-400 text-white"
-                } font-mono text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1.5 transition-all shadow-sm active:scale-95 cursor-pointer`}
-                title="Account Options"
-              >
-                <User size={13} className={isAuthenticated ? "text-emerald-400" : "text-emerald-300"} />
-                <span>{isAuthenticated ? (auth.user?.name?.split(" ")[0] || "Account") : "Account"}</span>
-                <ChevronDown
-                  size={12}
-                  className={`transition-transform duration-200 opacity-70 ${isAccountOpen ? "rotate-180" : ""}`}
-                />
-              </button>
-
-              {/* Dropdown Popup directly below the topbar button */}
-              {isAccountOpen && (
-                <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 rounded-2xl bg-[#092d29]/95 backdrop-blur-2xl border border-emerald-500/30 shadow-2xl shadow-black/80 p-4 text-white z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                  {isAuthenticated ? (
-                    <div className="space-y-3">
-                      {/* Active Session Status */}
-                      <div className="flex items-center justify-between pb-2.5 border-b border-white/10">
-                        <div className="flex items-center gap-2">
-                          <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                          <span className="text-[11px] font-mono uppercase tracking-wider text-emerald-300 font-semibold">
-                            Active Session
-                          </span>
-                        </div>
-                        <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                          {auth.user?.role?.includes("Operator") ? "Operator" : "Logged In"}
-                        </span>
-                      </div>
-
-                      {/* User Info (Name, Gmail, Location) */}
-                      <div className="flex items-start gap-3 py-1">
-                        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-500/30 to-teal-700/30 border border-emerald-400/40 flex items-center justify-center text-emerald-200 font-bold shrink-0 text-base shadow-inner">
-                          {auth.user?.name ? auth.user.name.charAt(0).toUpperCase() : "U"}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-xs font-semibold text-white truncate" title={auth.user?.name || "District Operator"}>
-                            {auth.user?.name || "District Operator"}
-                          </p>
-                          <p className="text-[11px] font-mono text-emerald-200/80 truncate mt-0.5" title={auth.user?.email || "operator@gmail.com"}>
-                            {auth.user?.email || "operator@gmail.com"}
-                          </p>
-                          {(auth.user?.district || auth.user?.state) && (
-                            <p className="text-[10px] text-white/60 flex items-center gap-1 mt-1 truncate">
-                              <MapPin size={10} className="text-emerald-400 shrink-0" />
-                              {[auth.user.district, auth.user.state].filter(Boolean).join(", ")}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Action buttons */}
-                      <div className="pt-2.5 border-t border-white/10 space-y-1.5">
-                        <button
-                          onClick={() => {
-                            setIsAccountOpen(false);
-                            navigate("/dashboard");
-                          }}
-                          className="w-full h-8 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-[11px] uppercase tracking-wider font-semibold flex items-center justify-center gap-2 transition-all shadow cursor-pointer"
-                        >
-                          Open Dashboard <ArrowUpRight size={13} />
-                        </button>
-                        <button
-                          onClick={() => {
-                            setIsAccountOpen(false);
-                            auth.logout();
-                          }}
-                          className="w-full h-8 px-3 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-300 hover:text-red-200 border border-red-500/30 font-mono text-[11px] uppercase tracking-wider font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer"
-                        >
-                          <LogOut size={13} /> Sign Out
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {/* Guest / Not Logged In Header */}
-                      <div className="flex items-center justify-between pb-2.5 border-b border-white/10">
-                        <div className="flex items-center gap-2">
-                          <span className="h-2 w-2 rounded-full bg-amber-400" />
-                          <span className="text-[11px] font-mono uppercase tracking-wider text-amber-300 font-semibold">
-                            Not Logged In
-                          </span>
-                        </div>
-                        <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">
-                          Guest User
-                        </span>
-                      </div>
-
-                      {/* Brief text */}
-                      <div className="py-1">
-                        <p className="text-[11px] text-white/80 leading-relaxed">
-                          Aap abhi logged in nahi hain. Early warning alerts, live sensor data aur district telemetry controls ke liye login karein.
-                        </p>
-                      </div>
-
-                      {/* Sign In & Sign Up Options */}
-                      <div className="pt-2.5 border-t border-white/10 space-y-1.5">
-                        <button
-                          onClick={() => {
-                            setIsAccountOpen(false);
-                            navigate("/login");
-                          }}
-                          className="w-full h-8 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-[11px] uppercase tracking-wider font-semibold flex items-center justify-center gap-2 transition-all shadow cursor-pointer"
-                        >
-                          <LogIn size={13} /> Sign In / Log In
-                        </button>
-                        <button
-                          onClick={() => {
-                            setIsAccountOpen(false);
-                            navigate("/login");
-                          }}
-                          className="w-full h-8 px-3 rounded-lg bg-white/5 hover:bg-white/10 text-white/80 hover:text-white border border-white/15 font-mono text-[11px] uppercase tracking-wider font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-                        >
-                          Create New Account
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Sleek Open Dashboard Button */}
             <button
-              onClick={() => navigate("/dashboard")}
-              className="h-9 px-4 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1.5 transition-all shadow-md hover:shadow-emerald-500/25 active:scale-95 cursor-pointer"
+              onClick={handleInstantJudgeAccess}
+              className="h-9 px-3.5 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-lg shadow-emerald-500/25 active:scale-95 cursor-pointer"
             >
-              Dashboard <ArrowUpRight size={14} />
+              <Sparkles size={14} /> Judge Demo <ArrowUpRight size={14} />
             </button>
           </div>
         </header>
@@ -262,159 +143,297 @@ export default function Home() {
           {/* Full Viewport Hero Section */}
           <section className="hero-section">
             <div className="hero-copy">
-              <p className="eyebrow accent-eyebrow !text-amber-400 font-semibold"><span className="eyebrow-line !bg-amber-400" /> AI + GIS EARLY WARNING · NER</p>
-              <h1 className="!text-white font-bold">Know the slope<br /><em className="hero-highlight">before</em> it moves.</h1>
-              <p className="hero-description !text-white/90">GeoAlert turns rainfall, terrain, satellite context, and live sensor signals into a clear window for action across North-East India.</p>
+              <div className="flex flex-wrap items-center gap-2 mb-2">
+                <span className="px-2.5 py-0.5 rounded-full bg-amber-400/20 border border-amber-400/50 text-amber-300 font-mono text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-amber-400 animate-ping" />
+                  SMART INDIA HACKATHON 2026 · PROBLEM ID: 26077
+                </span>
+              </div>
+              <h1 className="!text-white font-bold leading-tight">
+                Hyper-Local Weather &amp;<br />
+                <em className="hero-highlight text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300">
+                  Cloudburst Early Warning
+                </em>
+              </h1>
+              <p className="hero-description !text-white/90 leading-relaxed">
+                Ethrix-Nowcast harnesses an <strong>Earthformer Spatiotemporal Backbone</strong> with Tri-Head U-Nets to predict Cloudbursts, Flash Floods, and Severe Thunderstorms with a <strong>2–6 hour lead time</strong> across mountainous catchments.
+              </p>
+
               <div className="hero-actions flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5 sm:gap-3 w-full">
                 <button
-                  className="h-10 sm:h-9 px-4.5 rounded-lg sm:rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs sm:text-[11px] uppercase tracking-wider font-semibold flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-emerald-500/25 active:scale-95 cursor-pointer w-full sm:w-auto"
-                  onClick={() => navigate("/login")}
+                  className="h-11 px-5 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-amber-500 hover:from-emerald-400 hover:to-amber-400 text-slate-950 font-mono text-xs uppercase tracking-wider font-bold flex items-center justify-center gap-2 transition-all shadow-xl hover:shadow-emerald-500/30 active:scale-95 cursor-pointer w-full sm:w-auto"
+                  onClick={handleInstantJudgeAccess}
                 >
-                  <User size={13} className="text-emerald-200" /> Login / Sign Up <ArrowRight size={14} />
+                  <Sparkles size={15} /> Launch Live Prototype (Judge Access) <ArrowRight size={15} />
                 </button>
-                <button
-                  className="h-10 sm:h-9 px-4 rounded-lg sm:rounded-md border border-white/25 bg-white/10 hover:bg-white/20 hover:border-emerald-400 text-white font-mono text-xs sm:text-[11px] uppercase tracking-wider font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer w-full sm:w-auto"
-                  onClick={() => navigate("/dashboard")}
+                <a
+                  className="secondary-cta !h-11 !px-5 !text-xs !rounded-xl !text-white !border-white/30 hover:!border-amber-400 hover:!text-amber-300 !bg-white/5 flex items-center justify-center w-full sm:w-auto cursor-pointer"
+                  href="#architecture"
                 >
-                  Open Dashboard <ArrowUpRight size={14} />
-                </button>
-                <a className="secondary-cta !h-10 sm:!h-9 !px-4 !text-xs sm:!text-[11px] !rounded-lg sm:!rounded-md !text-white !border-white/30 hover:!border-amber-400 hover:!text-amber-400 !bg-white/5 flex items-center justify-center w-full sm:w-auto" href="#workflow">Explore System <ChevronRight size={14} /></a>
+                  Explore 5-Tier Architecture <ChevronRight size={15} />
+                </a>
               </div>
-              <div className="hero-meta">
-                <span className="!text-white/85 !border-white/20 !bg-[#06221f]/70"><ShieldAlert size={13} className="text-amber-400" /> Built for response teams</span>
-                <span className="!text-white/85 !border-white/20 !bg-[#06221f]/70"><Radio size={13} className="text-amber-400" /> Works through network loss</span>
+
+              <div className="hero-meta flex flex-wrap gap-2 pt-2">
+                <span className="!text-white/85 !border-white/20 !bg-[#06221f]/70 text-xs">
+                  <Satellite size={13} className="text-cyan-400" /> ISRO INSAT-3D TIR1 + NCMRWF IMDAA
+                </span>
+                <span className="!text-white/85 !border-white/20 !bg-[#06221f]/70 text-xs">
+                  <BrainCircuit size={13} className="text-emerald-400" /> Tier-3 Grad-CAM Explainable AI
+                </span>
+                <span className="!text-white/85 !border-white/20 !bg-[#06221f]/70 text-xs">
+                  <Radio size={13} className="text-amber-400" /> Tier-4 Gemini Bilingual SMS Alerts
+                </span>
               </div>
             </div>
 
-            {/* Hero Visual Card with Live Short Map */}
-            <div className="hero-risk-card" aria-label="Interactive North-East region risk map preview">
+            {/* Hero Visual Card with Live Map Preview */}
+            <div className="hero-risk-card" aria-label="Interactive Nowcast Map Preview">
               <div className="card-topline">
-                <span><Layers3 size={14} /> Interactive Regional Map</span>
-                <span className="muted-label"><span className="tiny-live-dot" /> Click a district</span>
+                <span className="flex items-center gap-1.5 font-mono text-xs text-emerald-300">
+                  <Layers3 size={14} /> Historical Convective Simulation (T-1h Trigger)
+                </span>
+                <span className="muted-label">
+                  <span className="tiny-live-dot" /> Click hotspot to inspect
+                </span>
               </div>
               <div className="hero-map-shell">
-                <GeoRiskMap districts={districts} selectedId={selectedId} onSelectDistrict={setSelectedId} />
+                <GeoRiskMap
+                  districts={districts}
+                  selectedId={selectedId}
+                  onSelectDistrict={setSelectedId}
+                  gradCamZones={activeStep.activeGradCamZones}
+                />
               </div>
               <div className="hero-risk-stats">
-                <div><span>RISK INDEX</span><strong>{selected.riskIndex.toFixed(2)}<small> / 1.00</small></strong></div>
-                <div><span>SENSORS LIVE</span><strong>{selected.sensorCount.split("/")[0].trim()}<small> / {selected.sensorCount.split("/")[1]?.trim()}</small></strong></div>
-                <div><span>LEAD TIME</span><strong>{selected.leadTime}</strong></div>
+                <div>
+                  <span>NOWCAST PROB</span>
+                  <strong className="text-red-400">{selected.cloudburstProb}%</strong>
+                </div>
+                <div>
+                  <span>INSAT-3D CTT</span>
+                  <strong className="text-cyan-300">{selected.cloudTopTemp}°C</strong>
+                </div>
+                <div>
+                  <span>EST. LEAD TIME</span>
+                  <strong className="text-amber-300">{selected.leadTime}</strong>
+                </div>
               </div>
             </div>
           </section>
         </main>
       </div>
 
-      <div>
-        {/* Signal Band */}
-        <section className="signal-band scroll-reveal">
-          <div className="signal-lead reveal-text"><p className="eyebrow">THE IDEA IN BRIEF</p><strong>Signals become time.<br /><em className="text-shimmer">Time becomes safer decisions.</em></strong></div>
-          <div className="signal-stat reveal-item reveal-delay-1"><strong>07</strong><span>NER states in scope</span></div>
-          <div className="signal-stat reveal-item reveal-delay-2"><strong>03</strong><span>core signal families</span></div>
-          <div className="signal-stat reveal-item reveal-delay-3"><strong>03</strong><span>alert channels planned</span></div>
-        </section>
+      {/* Signal Band */}
+      <section className="signal-band scroll-reveal">
+        <div className="signal-lead reveal-text">
+          <p className="eyebrow">ETHRIX NOWCAST ADVANTAGE</p>
+          <strong>
+            Deep atmospheric physics becomes actionable lead time.<br />
+            <em className="text-shimmer">From 15-minute sirens to 4-hour pre-evacuation.</em>
+          </strong>
+        </div>
+        <div className="signal-stat reveal-item reveal-delay-1">
+          <strong>2–6h</strong>
+          <span>Verified Early Warning Lead Time</span>
+        </div>
+        <div className="signal-stat reveal-item reveal-delay-2">
+          <strong>30m</strong>
+          <span>ISRO CartoDEM Topographic Resolution</span>
+        </div>
+        <div className="signal-stat reveal-item reveal-delay-3">
+          <strong>05 Tiers</strong>
+          <span>End-to-End AI Early Warning Architecture</span>
+        </div>
+      </section>
 
-        {/* Workflow Section with Full Background */}
-        <section className="workflow-section scroll-reveal" id="workflow">
-          <div className="workflow-copy">
-            <p className="eyebrow accent-eyebrow reveal-text"><span className="eyebrow-line" /> 02 / SIGNALS → ACTION</p>
-            <h2 className="reveal-text reveal-delay-1">From a wet hillside<br /><em className="text-shimmer">to a clear next step.</em></h2>
-            <p className="reveal-text reveal-delay-2">Designed to make complex terrain legible at the moment it matters—not bury your response team in another dashboard.</p>
-            <div className="workflow-steps">
-              <div className="reveal-item reveal-delay-1"><span>01</span><strong>Read the rain.</strong><p>Rain gauges, soil moisture, satellite context, and local weather patterns create a living baseline.</p></div>
-              <div className="reveal-item reveal-delay-2"><span>02</span><strong>Model the risk.</strong><p>Random Forest and XGBoost signals combine rolling rainfall, terrain, saturation, and past-event patterns.</p></div>
-              <div className="reveal-item reveal-delay-3"><span>03</span><strong>Alert the right people.</strong><p>Risk areas appear on a live map, with SMS, web, and response-team notifications ready for action.</p></div>
+      {/* 5-Tier Architecture Section (Pitch Focus) */}
+      <section className="workflow-section scroll-reveal" id="architecture">
+        <div className="workflow-copy">
+          <p className="eyebrow accent-eyebrow reveal-text">
+            <span className="eyebrow-line" /> 02 / 5-TIER SYSTEM ARCHITECTURE
+          </p>
+          <h2 className="reveal-text reveal-delay-1">
+            Engineered for high mountain terrain.<br />
+            <em className="text-shimmer">From raw satellite bytes to life-saving SMS.</em>
+          </h2>
+          <p className="reveal-text reveal-delay-2">
+            Standard radar nowcasts fail in the Himalayas due to beam blockage by high mountain ridges. Ethrix-Nowcast fuses satellite thermal dynamics, atmospheric reanalysis, and high-res digital elevation models.
+          </p>
+
+          <div className="workflow-steps space-y-4 pt-2">
+            <div className="reveal-item reveal-delay-1 p-3 rounded-xl bg-black/40 border border-white/10">
+              <span className="text-xs font-mono font-bold text-cyan-400">TIER 1</span>
+              <strong className="text-white block mt-1">Multi-Modal Data Ingestion</strong>
+              <p className="text-xs text-zinc-300">
+                ISRO INSAT-3D TIR1 half-hourly cloud top temperatures, NCMRWF IMDAA 12km atmospheric moisture flux, and ISRO 30m CartoDEM digital elevation models.
+              </p>
+            </div>
+            <div className="reveal-item reveal-delay-2 p-3 rounded-xl bg-black/40 border border-white/10">
+              <span className="text-xs font-mono font-bold text-emerald-400">TIER 2</span>
+              <strong className="text-white block mt-1">Earthformer AI Brain + Tri-Head U-Net</strong>
+              <p className="text-xs text-zinc-300">
+                Spatiotemporal transformer backbone outputs three simultaneous hazard probabilities: Severe Thunderstorm, Cloudburst Deluge, and Flash Flood Runoff.
+              </p>
+            </div>
+            <div className="reveal-item reveal-delay-3 p-3 rounded-xl bg-black/40 border border-white/10">
+              <span className="text-xs font-mono font-bold text-amber-400">TIER 3</span>
+              <strong className="text-white block mt-1">Grad-CAM Explainable AI (XAI) Verification</strong>
+              <p className="text-xs text-zinc-300">
+                Visual saliency heatmaps verify model attention over valley choke points, preventing false alarms and providing decision confidence to District Collectors.
+              </p>
+            </div>
+            <div className="reveal-item reveal-delay-4 p-3 rounded-xl bg-black/40 border border-white/10">
+              <span className="text-xs font-mono font-bold text-rose-400">TIER 4</span>
+              <strong className="text-white block mt-1">Tier-4 GenAI Bilingual Alert Engine</strong>
+              <p className="text-xs text-zinc-300">
+                Gemini/Groq LLMs convert raw ML risk indices into actionable bilingual (Hindi &amp; English) emergency SMS alerts with precise safe assembly refuges.
+              </p>
+            </div>
+            <div className="reveal-item reveal-delay-5 p-3 rounded-xl bg-black/40 border border-white/10">
+              <span className="text-xs font-mono font-bold text-teal-400">TIER 5</span>
+              <strong className="text-white block mt-1">FastAPI + GIS Command Surface</strong>
+              <p className="text-xs text-zinc-300">
+                Real-time Mapbox/Leaflet interactive dashboard equipped with historical time-scrubber, siren array trigger, and cell-broadcast gateways.
+              </p>
             </div>
           </div>
-          <div className="workflow-image" />
-        </section>
+        </div>
+        <div className="workflow-image" />
+      </section>
 
-        {/* Risk Level Section */}
-        <section className="risk-level-section scroll-reveal" id="risk-levels">
-          <div className="risk-level-copy">
-            <p className="eyebrow accent-eyebrow reveal-text"><span className="eyebrow-line" /> 03 / FOR RESPONSE TEAMS</p>
-            <h2 className="reveal-text reveal-delay-1">Clarity for the people<br />who have to <em className="text-shimmer">move first.</em></h2>
-            <p className="section-intro reveal-text reveal-delay-2">The hardest part is not collecting data. It is turning a changing slope into enough time to prepare, respond, and move to safety.</p>
-          </div>
-          <div className="risk-level-list">
-            <div className="level-item level-low reveal-item reveal-delay-1"><span>01</span><div><strong>Low</strong><p>Routine monitoring</p></div></div>
-            <div className="level-item level-moderate reveal-item reveal-delay-2"><span>02</span><div><strong>Moderate</strong><p>Stay informed</p></div></div>
-            <div className="level-item level-high reveal-item reveal-delay-3"><span>03</span><div><strong>High</strong><p>Prepare to respond</p></div></div>
-            <div className="level-item level-critical reveal-item reveal-delay-4"><span>04</span><div><strong>Critical</strong><p>Act now</p></div></div>
-          </div>
-        </section>
-
-        {/* Field Note Section */}
-        <section className="field-note-section scroll-reveal" id="field-note">
-          <div className="field-note-copy">
-            <p className="eyebrow reveal-text">04 / THE FIELD NOTE</p>
-            <h2 className="reveal-text reveal-delay-1">Read the risk.<br /><em className="text-shimmer">Ready the response.</em></h2>
-            <p className="reveal-text reveal-delay-2">Affordable sensor nodes, open mapping, weather APIs, and local context become more useful when the interface answers one question clearly: what should we do next?</p>
-            <button className="text-link reveal-text reveal-delay-3" onClick={() => navigate(isAuthenticated ? "/dashboard" : "/login")}>
-              Open Dashboard <ArrowUpRight size={14} />
-            </button>
-          </div>
-          <div className="terrain-study rounded-xl border border-border/40 shadow-xl reveal-item reveal-delay-2" style={{ backgroundImage: "url('/images/geoalert-field-note-mini.png')" }}>
-            <div className="terrain-study-overlay" />
-            <span className="study-label">SENSOR FIELD TELEMETRY</span>
-            <span className="study-coordinates">27.4728° N, 94.9120° E · ELEV. 1,420M</span>
-            <div className="study-readout">
-              <div>SOIL SATURATION<strong>78.4%</strong></div>
-              <div>RAINFALL RATE<strong>42 mm/hr</strong></div>
-              <div>SLOPE DISPLACEMENT<strong>+1.8 mm</strong></div>
+      {/* Atmospheric Triggers & Risk Levels */}
+      <section className="risk-level-section scroll-reveal" id="risk-levels">
+        <div className="risk-level-copy">
+          <p className="eyebrow accent-eyebrow reveal-text">
+            <span className="eyebrow-line" /> 03 / ATMOSPHERIC TRIGGERS
+          </p>
+          <h2 className="reveal-text reveal-delay-1">
+            Physical signatures that precede<br />
+            <em className="text-shimmer">catastrophic cloudburst events.</em>
+          </h2>
+          <p className="section-intro reveal-text reveal-delay-2">
+            Cloudbursts are not random accidents. They leave measurable physical footprints across thermodynamic and satellite channels hours before impact.
+          </p>
+        </div>
+        <div className="risk-level-list">
+          <div className="level-item level-low reveal-item reveal-delay-1">
+            <span>01</span>
+            <div>
+              <strong>Advisory Phase</strong>
+              <p>CAPE &lt; 1500 J/kg · Nominal solar heating · Normal baseline telemetry</p>
             </div>
           </div>
-        </section>
-      </div>
+          <div className="level-item level-moderate reveal-item reveal-delay-2">
+            <span>02</span>
+            <div>
+              <strong>Convective Watch</strong>
+              <p>CAPE 1500–2200 J/kg · CIN cap erosion · Towering cumulus initiation</p>
+            </div>
+          </div>
+          <div className="level-item level-high reveal-item reveal-delay-3">
+            <span>03</span>
+            <div>
+              <strong>Severe Warning</strong>
+              <p>Radar dBZ &gt; 45 · CTT drops to -58°C · Valley choke constriction</p>
+            </div>
+          </div>
+          <div className="level-item level-critical reveal-item reveal-delay-4">
+            <span>04</span>
+            <div>
+              <strong>Cloudburst Nowcast</strong>
+              <p>CTT &lt; -68°C · Rain rate &gt; 80 mm/h · 88%+ AI Cloudburst Certainty</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
-      {/* Footer Redesign */}
+      {/* Field Note Section */}
+      <section className="field-note-section scroll-reveal" id="field-note">
+        <div className="field-note-copy">
+          <p className="eyebrow reveal-text">04 / THE AI ARCHITECTURE</p>
+          <h2 className="reveal-text reveal-delay-1">
+            Earthformer Spatiotemporal<br />
+            <em className="text-shimmer">Neural Nowcasting.</em>
+          </h2>
+          <p className="reveal-text reveal-delay-2">
+            Traditional Numerical Weather Prediction (NWP) models require 3–6 hours of high-performance compute time. Ethrix-Nowcast’s transformer inference generates high-resolution risk heatmaps in under 4 seconds.
+          </p>
+          <button
+            className="text-link reveal-text reveal-delay-3 cursor-pointer"
+            onClick={handleInstantJudgeAccess}
+          >
+            Launch Interactive Nowcast Dashboard <ArrowUpRight size={14} />
+          </button>
+        </div>
+        <div
+          className="terrain-study rounded-xl border border-border/40 shadow-xl reveal-item reveal-delay-2"
+          style={{ backgroundImage: "url('/images/geoalert-field-note-mini.png')" }}
+        >
+          <div className="terrain-study-overlay" />
+          <span className="study-label">INSAT-3D &amp; CARTODEM FUSION</span>
+          <span className="study-coordinates">32.2190° N, 76.3230° E · ELEV. 1,457M</span>
+          <div className="study-readout">
+            <div>
+              CLOUD TOP TEMP<strong>-68.4°C</strong>
+            </div>
+            <div>
+              SURFACE CAPE<strong>2,980 J/kg</strong>
+            </div>
+            <div>
+              CLOUDBURST PROB<strong>88.4%</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
       <footer className="footer-redesign scroll-reveal">
         <div className="footer-container">
-          {/* Brand Column */}
           <div className="footer-brand-col">
             <div className="brand-lockup flex items-center gap-3">
-              <img src="/logo.png" alt="GeoAlert Logo" className="h-12 md:h-14 w-auto object-contain shrink-0 filter drop-shadow-sm" />
-              <span><strong className="text-base tracking-wider">GEOALERT</strong></span>
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-400 to-amber-500 flex items-center justify-center text-slate-950 font-bold shadow-md">
+                <CloudLightning size={20} />
+              </div>
+              <span>
+                <strong className="text-base tracking-wider text-white">ETHRIX-NOWCAST</strong>
+              </span>
             </div>
             <p className="footer-tagline">
-              AI + GIS-driven landslide early warning platform tailored for Northeast India terrain. Sensor-aware · Response-ready.
+              AI-Driven Hyper-Local Weather &amp; Cloudburst Early Warning System (SIH Problem ID: 26077). 2–6 hour lead time nowcasting with Grad-CAM XAI and Tier-4 bilingual evacuation alerts.
             </p>
             <div className="footer-status-pill">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>ALL SENSOR NODES OPERATIONAL · 07 NER STATES</span>
+              <span>ISRO INSAT-3D &amp; CARTODEM PIPELINE READY · SIH 2026</span>
             </div>
           </div>
 
-          {/* Navigation Column */}
           <div className="footer-nav-col">
             <span className="footer-col-title">NAVIGATION</span>
             <ul className="footer-nav-list">
-              <li><a href="#workflow">02 / Workflow & Signals</a></li>
-              <li><a href="#risk-levels">03 / For Response Teams</a></li>
-              <li><a href="#field-note">04 / The Field Note</a></li>
-              <li><button onClick={() => navigate("/login")}>Login / Sign Up →</button></li>
-              <li><button onClick={() => navigate("/dashboard")}>Open Response Console →</button></li>
+              <li><a href="#top">Overview</a></li>
+              <li><a href="#architecture">5-Tier Architecture</a></li>
+              <li><a href="#risk-levels">Atmospheric Triggers</a></li>
+              <li><button onClick={handleInstantJudgeAccess}>Judge Interactive Demo →</button></li>
             </ul>
           </div>
 
-          {/* Regional Coverage Column */}
           <div className="footer-meta-col">
-            <span className="footer-col-title">REGIONAL COVERAGE</span>
+            <span className="footer-col-title">HIGH-RISK VALLEY CATCHMENTS</span>
             <div className="footer-meta-tags">
-              <span>Arunachal Pradesh</span>
-              <span>Meghalaya</span>
-              <span>Sikkim</span>
-              <span>Assam</span>
-              <span>Mizoram</span>
-              <span>Manipur</span>
-              <span>Nagaland</span>
+              <span>Kangra &amp; Bhagsu (HP)</span>
+              <span>Beas River Gorge (HP)</span>
+              <span>Parvati Valley (HP)</span>
+              <span>Kedarnath Mandakini (UK)</span>
+              <span>Chamoli Alaknanda (UK)</span>
+              <span>Sohra Escarpment (Meghalaya)</span>
+              <span>Teesta Basin (Sikkim)</span>
             </div>
           </div>
         </div>
 
-        {/* Bottom Bar */}
         <div className="footer-bottom-bar">
-          <span>© 2026 GEOALERT · LANDSLIDE EARLY WARNING SYSTEM</span>
+          <span>© 2026 ETHRIX-NOWCAST · HYPER-LOCAL CLOUDBURST EARLY WARNING (SIH PROBLEM ID: 26077)</span>
         </div>
       </footer>
     </div>
