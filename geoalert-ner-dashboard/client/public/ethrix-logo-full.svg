@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 68" fill="none">
+  <defs>
+    <linearGradient id="full-emerald" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399" />
+      <stop offset="50%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+    <linearGradient id="full-cyan" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#06b6d4" />
+      <stop offset="100%" stop-color="#38bdf8" />
+    </linearGradient>
+    <linearGradient id="full-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a" />
+      <stop offset="50%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+    <filter id="full-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2.5" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Logo Mark (scaled inside 56x56 box at x=6, y=6) -->
+  <g transform="translate(6, 6) scale(0.56)">
+    <!-- Hexagonal Tech Shield Outer Contour -->
+    <polygon
+      points="50,6 88,27 88,73 50,94 12,73 12,27"
+      fill="url(#full-emerald)"
+      fill-opacity="0.12"
+      stroke="url(#full-emerald)"
+      stroke-width="3"
+      stroke-linejoin="round"
+    />
+    <!-- Concentric Doppler Radar Arcs -->
+    <path
+      d="M26,38 A28,28 0 0,1 74,38"
+      fill="none"
+      stroke="url(#full-cyan)"
+      stroke-width="2.2"
+      stroke-dasharray="3,4"
+      stroke-linecap="round"
+      opacity="0.75"
+    />
+    <path
+      d="M33,45 A19,19 0 0,1 67,45"
+      fill="none"
+      stroke="url(#full-cyan)"
+      stroke-width="2.5"
+      stroke-linecap="round"
+      opacity="0.9"
+    />
+    <!-- Mountain Peak Silhouette -->
+    <path
+      d="M22,70 L38,50 L48,60 L62,42 L78,70 Z"
+      fill="url(#full-emerald)"
+      fill-opacity="0.3"
+      stroke="url(#full-emerald)"
+      stroke-width="2"
+      stroke-linejoin="round"
+    />
+    <!-- Convective Cloud -->
+    <path
+      d="M30,50 C26,50 22,46 22,41 C22,36 26,33 30,33 C31,27 36,22 43,22 C49,22 54,26 56,31 C59,29 64,30 66,33 C71,34 74,38 74,43 C74,48 70,51 65,51 Z"
+      fill="url(#full-cyan)"
+      fill-opacity="0.22"
+      stroke="url(#full-cyan)"
+      stroke-width="2"
+      stroke-linejoin="round"
+    />
+    <!-- Lightning Bolt -->
+    <polygon
+      points="53,16 37,47 48,47 43,76 65,42 53,42"
+      fill="url(#full-gold)"
+      stroke="#fff"
+      stroke-width="1.2"
+      filter="url(#full-glow)"
+    />
+  </g>
+
+  <!-- Brand Typography -->
+  <!-- "ETHRIX" in bold serif uppercase -->
+  <text x="74" y="36" font-family="'Cormorant Garamond', 'Cinzel', serif" font-size="28" font-weight="700" fill="#ffffff" letter-spacing="2">ETHRIX</text>
+  
+  <!-- "-NOWCAST" in modern sans/mono cyan highlight -->
+  <text x="194" y="36" font-family="'IBM Plex Mono', monospace" font-size="20" font-weight="700" fill="#34d399" letter-spacing="3">-NOWCAST</text>
+
+  <!-- Subtitle Tagline Badge -->
+  <rect x="74" y="44" width="220" height="15" rx="3" fill="#10b981" fill-opacity="0.12" stroke="#10b981" stroke-opacity="0.3" stroke-width="0.8" />
+  <circle cx="82" cy="51.5" r="2.5" fill="#34d399" />
+  <text x="89" y="55" font-family="'IBM Plex Mono', monospace" font-size="8" font-weight="600" fill="#6ee7b7" letter-spacing="1.2">SIH ID: 26077 · 2–6H EARLY WARNING</text>
+</svg>
