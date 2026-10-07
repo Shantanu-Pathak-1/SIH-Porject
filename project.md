@@ -6,7 +6,7 @@
 - **Theme:** Disaster Management
 - **PS Category:** Software
 - **Team Name:** Ethrix
-- **Idea Title:** GeoAlert-NER: AI & GIS-Driven Landslide Early Warning System
+- **Idea Title:** Ethrix-Nowcast: AI & GIS-Driven Landslide Early Warning System
 
 ---
 

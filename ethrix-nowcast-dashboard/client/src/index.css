@@ -361,7 +361,7 @@ a { color: inherit; text-decoration: none; }
   content: "";
   position: absolute;
   inset: 0;
-  background-image: url('/images/geoalert-workflow-hillside.jpg');
+  background-image: url('/images/ethrix-workflow-hillside.jpg');
   background-size: cover;
   background-position: center right;
   opacity: 0.95;
@@ -477,7 +477,7 @@ a { color: inherit; text-decoration: none; }
   content: "";
   position: absolute;
   inset: 0;
-  background-image: url('/images/geoalert-response-team-landslide.png');
+  background-image: url('/images/ethrix-response-team.png');
   background-size: cover;
   background-position: center center;
   opacity: 0.95;
@@ -594,7 +594,7 @@ a { color: inherit; text-decoration: none; }
   content: "";
   position: absolute;
   inset: 0;
-  background-image: url('/images/geoalert-field-note-bg.png');
+  background-image: url('/images/ethrix-field-note-bg.png');
   background-size: cover;
   background-position: center center;
   opacity: 0.95;

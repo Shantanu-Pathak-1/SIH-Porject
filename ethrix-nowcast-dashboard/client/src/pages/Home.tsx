@@ -363,7 +363,7 @@ export default function Home() {
         </div>
         <div
           className="terrain-study rounded-xl border border-border/40 shadow-xl reveal-item reveal-delay-2"
-          style={{ backgroundImage: "url('/images/geoalert-field-note-mini.png')" }}
+          style={{ backgroundImage: "url('/images/ethrix-field-note-mini.png')" }}
         >
           <div className="terrain-study-overlay" />
           <span className="study-label">INSAT-3D &amp; CARTODEM FUSION</span>

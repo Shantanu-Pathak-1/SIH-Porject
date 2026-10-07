@@ -134,7 +134,7 @@ For the SIH online screening phase (PPT submission), the prototype is primed wit
 
 ```
 SIH/
-├── geoalert-ner-dashboard/           # Main Production Web Dashboard
+├── ethrix-nowcast-dashboard/         # Main Production Web Dashboard
 │   ├── client/
 │   │   ├── index.html                # App entrypoint (Ethrix-Nowcast metadata)
 │   │   └── src/
@@ -143,11 +143,12 @@ SIH/
 │   │       │   ├── XaiRiskPanel.tsx        # Tier-3 Grad-CAM Explainable AI drawer
 │   │       │   ├── LlmAlertModal.tsx       # Tier-4 GenAI bilingual SMS alert modal
 │   │       │   ├── GeoRiskMap.tsx          # Leaflet GIS map with dynamic Grad-CAM heatmaps
-│   │       │   ├── DashboardLayout.tsx     # Command sidebar with 1-click Judge Demo access
+│   │       │   ├── DashboardLayout.tsx     # Command sidebar with 1-click Demo access
 │   │       │   ├── TrendCharts.tsx         # Multi-metric dual axis charts
 │   │       │   └── SensorNodeAnalytics.tsx # Sensor telemetry analytics
 │   │       ├── lib/
 │   │       │   ├── nowcastData.ts          # 6-step historical cloudburst dataset
+│   │       │   ├── nowcastHelpers.ts       # Signal analytics & risk calculation helpers
 │   │       │   └── districtsData.ts        # Valley & catchment metadata
 │   │       ├── pages/
 │   │       │   ├── Home.tsx                # Landing page with 5-Tier architecture pitch
@@ -163,6 +164,7 @@ SIH/
 ├── backend/                          # FastAPI Backend Architecture (For Finale Phase)
 │   └── ...
 ├── changes.md                        # Problem statement transition brief
+├── ETHRIX_NOWCAST_PITCH_AND_ROADMAP.md # Live demonstration script & architecture pitch
 └── README.md                         # Project documentation
 ```
 
@@ -181,14 +183,16 @@ cd SIH-Porject
 git checkout ethrix-nowcast
 ```
 
-### Step 2: Install Frontend Dependencies
+### Step 2: Run Directly from Root (Zero `cd` Needed)
+You can now run commands directly from the root workspace folder:
 ```bash
-cd geoalert-ner-dashboard
-npm install
+npm run dev
 ```
 
-### Step 3: Start Vite Dev Server
+*(Alternatively, you can navigate into the dashboard folder):*
 ```bash
+cd ethrix-nowcast-dashboard
+npm install
 npm run dev
 ```
 
@@ -197,7 +201,7 @@ Open your browser at:
 http://localhost:5173
 ```
 
-### Step 4: Build for Production (Vercel Deployment)
+### Step 3: Build for Production (Vercel Deployment)
 ```bash
 npm run build
 ```

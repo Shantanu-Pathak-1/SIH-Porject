@@ -1,11 +1,11 @@
-# GeoAlert-NER: SIH 2026 Working Prototype & Roadmap 🏔️⚡
+# Ethrix-Nowcast: Working Prototype & Roadmap 🏔️⚡
 
 **Team Ethrix | Problem Statement ID: SIH26001**  
 *AI & GIS-Driven Landslide Early Warning and Spatial Monitoring System for North Eastern Region (NER)*
 
 ---
 
-## 🎯 Prototype Audit: Is it Ready for SIH Demo Today?
+## 🎯 Prototype Audit: Is it Ready for Demo Today?
 
 **YES, 100% READY.** Your working prototype covers the entire end-to-end telemetry, GIS mapping, ML prediction, satellite fallback, and emergency alerting pipeline.
 
@@ -34,9 +34,9 @@
 
 ---
 
-## 💡 Unique Innovations (Why GeoAlert-NER Stands Out to Judges)
+## 💡 Unique Innovations (Why Ethrix-Nowcast Stands Out)
 
-| Innovation | Traditional Systems | GeoAlert-NER (Our Prototype) |
+| Innovation | Traditional Systems | Ethrix-Nowcast (Our Prototype) |
 | :--- | :--- | :--- |
 | **Rainfall Tracking** | Uses only current 24h rain (misses ground saturation). | **Antecedent Tracking**: Tracks 3 to 7-day cumulative saturation. |
 | **Geospatial Processing** | Manual Python math (slow, unscalable). | **Native PostGIS**: Database-level `ST_Distance`, `ST_Buffer`, `ST_DWithin`, `ST_AsGeoJSON`. |

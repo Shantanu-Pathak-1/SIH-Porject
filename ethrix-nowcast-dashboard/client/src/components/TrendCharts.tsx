@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { Chart as ChartJS, CategoryScale, Filler, Legend, LinearScale, LineElement, PointElement, Tooltip } from "chart.js";
 import { Line } from "react-chartjs-2";
 import type { District } from "@/lib/districtsData";
-import { trendSeries } from "@/lib/geoalert";
+import { trendSeries } from "@/lib/nowcastHelpers";
 
 ChartJS.register(CategoryScale, Filler, Legend, LinearScale, LineElement, PointElement, Tooltip);
 
